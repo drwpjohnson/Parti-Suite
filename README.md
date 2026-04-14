@@ -2,11 +2,13 @@
 
 **Particle Trajectory and Continuum Upscaling Colloid Transport Codes**
 
-W.P. Johnson and E.F. Pazmiño Research Groups  
+W.P. Johnson Research Group  
 University of Utah, Department of Geology & Geophysics  
-Escuela Politécnica Nacional, Department of Extractive Metallurgy  
+william.johnson@utah.edu
 
-william.johnson@utah.edu · eddy.pazmino@epn.edu.ec
+Matlab codes authored by E.F. Pazmiño  
+Escuela Politécnica Nacional, Department of Extractive Metallurgy  
+eddy.pazmino@epn.edu.ec
 
 ---
 
@@ -179,12 +181,16 @@ If you use Parti-Suite in published work, please cite the companion textbook and
 
 ## License
 
-*License to be confirmed.*
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+Copyright © 2025 William P. Johnson. Matlab codes copyright © 2025 Eddy F. Pazmiño.
 
 ---
 
 ## Contact
 
 William P. Johnson — william.johnson@utah.edu  
-Eddy F. Pazmiño — eddy.pazmino@epn.edu.ec  
 University of Utah, Department of Geology & Geophysics
+
+Eddy F. Pazmiño (Matlab codes) — eddy.pazmino@epn.edu.ec  
+Escuela Politécnica Nacional, Department of Extractive Metallurgy
