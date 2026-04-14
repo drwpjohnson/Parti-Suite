@@ -270,7 +270,7 @@ in the flow field.
 | [User Manual](../../../docs/user_manual.md) | Setup, running, monitoring, interpreting results, troubleshooting |
 | [Parameter Glossary](../../../docs/traj_glossary.md) | Every input parameter defined with units and typical values |
 | [Attachment Criteria](../../../docs/traj_attachment.md) | Outcome codes, zone logic, slow-motion criteria |
-| [Trajectory Flowchart](../../../docs/traj_flowchart.html) | Visual overview of the trajectory loop (open in browser) |
+| [Trajectory Flowchart](https://drwpjohnson.github.io/Parti-Suite/docs/traj_flowchart.html) | Visual overview of the trajectory loop (open in browser) |
 
 ---
 

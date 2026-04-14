@@ -157,7 +157,7 @@ We suggest beginning simulations with larger colloids (> 1 µm) and higher fluid
 | [User Manual](docs/user_manual.md) | Setup, running, monitoring, and interpreting trajectory simulation results |
 | [Parameter Glossary](docs/traj_glossary.md) | Every input parameter with units, typical values, and physical meaning |
 | [Attachment Criteria](docs/traj_attachment.md) | Outcome codes, zone logic, slow-motion criteria |
-| [Trajectory Flowchart](docs/traj_flowchart.html) | Visual overview of the trajectory loop (open in browser) |
+| [Trajectory Flowchart](https://drwpjohnson.github.io/Parti-Suite/docs/traj_flowchart.html) | Visual overview of the trajectory loop (open in browser) |
 | [Physics Background](docs/physics_background.md) | xDLVO theory, DRNH, force and torque balance, Interception History framework |
 | [References](docs/references.md) | Full citation list |
 
