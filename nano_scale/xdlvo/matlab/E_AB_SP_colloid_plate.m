@@ -1,0 +1,6 @@
+%Energy AB_Sphere-Plate_colloid_plate (J)
+function[deltaGAB]=E_AB_SP_colloid_plate(H,lambdaAB,a1,gammaoAB,ho)
+deltaGAB=(1-lambdaAB/a1+(1+lambdaAB/a1)*...
+            exp(-2*a1/lambdaAB))*2*pi*a1*lambdaAB*gammaoAB.*...
+            exp(-(H-ho)/lambdaAB);
+end

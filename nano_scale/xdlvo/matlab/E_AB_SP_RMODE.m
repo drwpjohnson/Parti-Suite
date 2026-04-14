@@ -1,0 +1,36 @@
+%Energy AB_Sphere-Plate_RMODE1 (J)
+function[deltaGAB]=E_AB_SP_RMODE(H,lambdaAB,aasp,nAB,gammaoAB,ho,...
+                                RMODE,a1,Nco)
+    if RMODE==1
+        deltaGAB=nAB*(1-lambdaAB/aasp+(1+lambdaAB/aasp)*...
+            exp(-2*aasp/lambdaAB))*2*pi*aasp*lambdaAB*gammaoAB.*...
+            exp(-(H-ho)/lambdaAB);
+    end
+    if RMODE==2
+        aeff=2*aasp*a1/(aasp+a1);%%[m] effective radius
+         %Corecction factor
+        correc_factor=(1-lambdaAB/aeff+lambdaAB^2/(2*aeff^2)-...
+            4*aeff/(3*lambdaAB)*exp(-2*aeff/lambdaAB)-...
+            (1+lambdaAB/aeff+lambdaAB^2/(2*aeff^2))*...
+            exp(-4*aeff/lambdaAB));
+        
+        deltaGAB=nAB*correc_factor*pi*aeff*lambdaAB*gammaoAB.*...
+                 exp(-(H-ho)/lambdaAB);
+    end
+    if RMODE==3
+        aeff=2*aasp*aasp/(aasp+aasp);%[m] effective radius
+         %Corecction factor
+        correc_factor=(1-lambdaAB/aeff+lambdaAB^2/(2*aeff^2)-...
+            4*aeff/(3*lambdaAB)*exp(-2*aeff/lambdaAB)-...
+            (1+lambdaAB/aeff+lambdaAB^2/(2*aeff^2))*...
+            exp(-4*aeff/lambdaAB));
+        
+        deltaGAB=Nco*nAB*correc_factor*pi*aeff*lambdaAB*gammaoAB.*...
+                 exp(-(H-ho)/lambdaAB);   
+    end
+    %
+    % make zero Energy values calculated for H>aasp 
+    %(comply with Dejarguin aproximation)
+    c=H>aasp;
+    deltaGAB(c)=0.0;
+end

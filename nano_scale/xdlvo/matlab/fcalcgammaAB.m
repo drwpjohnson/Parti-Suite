@@ -1,0 +1,6 @@
+function cgammaAB = fcalcgammaAB
+global g1pos g1neg g2pos g2neg g3pos g3neg
+cgammaAB=2*(sqrt(g3pos)*(sqrt(g1neg)+sqrt(g2neg)-sqrt(g3neg))+...
+    sqrt(g3neg)*(sqrt(g1pos)+sqrt(g2pos)-sqrt(g3pos))-sqrt(g1pos*g2neg)-...
+    sqrt(g1neg*g2pos));
+end

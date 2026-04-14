@@ -1,0 +1,27 @@
+%     SUBROUTINE BORN FORCE (N) (DERIVED FROM ENERGY GIVEN BY RUCKENSTEIN & PRIEVE 1976)
+function FBORN=AFMFORCEBORN (A132,SIGMAC,AP,H,A11,A22,A33,AC1C1,AC2C2,VDWMODE)
+    %FBORN = (A132*SIGMAC^6/1260)*((7*AP-H)/H^8+(9*AP+H)/(2*AP+H)^8);
+    %SUBROUTINE BORN FORCE (N) (DERIVED FROM ENERGY GIVEN BY RUCKENSTEIN & PRIEVE 1976)
+    A1C2  = (A11^0.5)*(AC2C2^0.5); 
+    A13   = (A11^0.5)*(A33^0.5);
+    AC12  = (AC1C1^0.5)*(A22^0.5);
+    AC1C2 = (AC1C1^0.5)*(AC2C2^0.5);
+    AC13  = (AC1C1^0.5)*(A33^0.5);
+    A23   = (A22^0.5)*(A33^0.5);
+    AC23  = (AC2C2^0.5)*(A33^0.5);
+    if (VDWMODE==1)
+        FBORN = (abs(A132)*SIGMAC^6/1260)*((7*AP-H)/H^8+(9*AP+H)/(2*AP+H)^8);
+    end
+    if (VDWMODE==2)
+        FBORN = ((abs(AC1C2-AC23-AC13+A33))*SIGMAC^6/1260)*((7*AP-H)/H^8+(9*AP+H)/(2*AP+H)^8);
+    end
+    if (VDWMODE==3)
+        FBORN = ((abs(A1C2-AC23-A13+A33))*SIGMAC^6/1260)*((7*AP-H)/H^8+(9*AP+H)/(2*AP+H)^8);
+    end
+    if (VDWMODE==4)
+        FBORN = ((abs(AC12-A23-AC13+A33))*SIGMAC^6/1260)*((7*AP-H)/H^8+(9*AP+H)/(2*AP+H)^8);
+    end
+    if (abs(FBORN)<1.0E-30)
+        FBORN = 0.0;
+    end
+end

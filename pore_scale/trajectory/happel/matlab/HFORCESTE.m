@@ -1,0 +1,7 @@
+%     SUBROUTINE STERIC FORCE
+function FSTE=HFORCESTE (PI,GAMMA0STE,LAMBDASTE,ASTE,H)
+      FSTE = GAMMA0STE/LAMBDASTE*exp(-H/LAMBDASTE)*PI*ASTE^2;
+    if (abs(FSTE)<1.0E-30)  
+        FSTE = 0.0;
+    end      
+end

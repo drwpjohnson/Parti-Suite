@@ -1,0 +1,6 @@
+%Force EDL_Sphere-sphere_colloid_plate (N)
+function[ForceEDL]=F_EDL_SS_colloid_plate(H,theta,eps,K,kB,T,z,zeta1,e_charge,zeta2,a1,a2)
+ForceEDL=theta*(64*pi*eps*K*a1*a2/(a1+a2)*...
+    (kB*T/z/e_charge)^2*tanh(z*e_charge*zeta1/4/kB/T)*...
+    tanh(z*e_charge*zeta2/4/kB/T).*exp(-K*H));
+end
