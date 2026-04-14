@@ -1,0 +1,25 @@
+#!/bin/tcsh
+#SBATCH -t 100:00:00
+#SBATCH --ntasks=20
+#SBATCH --nodes=1
+#SBATCH --job-name=jobname_jet.err
+#SBATCH -A wjohnson-kp
+#SBATCH -p wjohnson-kp
+
+set NPART=5
+set NPROC=$SLURM_NTASKS
+
+set DATADIR=/uufs/chpc.utah.edu/common/home/u0034962/king2/run/test2
+
+set WORKDIR=/scratch/general/vast/u0034962/test2
+
+mkdir -p $WORKDIR
+
+cd $WORKDIR
+cp $DATADIR/* .
+
+/uufs/chpc.utah.edu/common/home/u0034962/king2/bin/jet.csh $NPART $NPROC
+
+cp *.OUT $DATADIR/
+cd $DATADIR
+rm -rf $WORKDIR

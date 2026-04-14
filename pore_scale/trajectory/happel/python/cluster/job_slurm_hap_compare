@@ -1,0 +1,34 @@
+#!/bin/tcsh
+#SBATCH -t 100:00:00
+#SBATCH --ntasks=1
+#SBATCH --nodes=1
+#SBATCH --job-name=jobname_hap_compare.err
+#SBATCH -A wjohnson-kp
+#SBATCH -p wjohnson-kp
+
+# Single-particle direct invocation for Fortran vs Python comparison
+# Bypasses submit/hap.csh to allow full argument list (XINIT, YINIT override)
+# Set XINIT and YINIT from Fortran flux output before submitting
+
+module purge
+module load intel-oneapi-compilers/2021.4.0 openmpi/4.1.1
+
+set NPART=1
+set IPART=1
+set DATADIR=/uufs/chpc.utah.edu/common/home/u0034962/king4/run/test4
+set WORKDIR=/scratch/general/vast/u0034962/test4
+set PRGDIR=/uufs/chpc.utah.edu/common/home/u0034962/king4/bin
+
+# Injection point override — set from Fortran flux output
+set XINIT=6.8741727e-07
+set YINIT=-3.5873458e-06
+
+mkdir -p $WORKDIR
+cd $WORKDIR
+cp $DATADIR/* .
+
+/usr/bin/python3 $PRGDIR/traj_hap.py $NPART $IPART $WORKDIR $XINIT $YINIT
+
+cp *.OUT $DATADIR/
+cd $DATADIR
+rm -rf $WORKDIR
