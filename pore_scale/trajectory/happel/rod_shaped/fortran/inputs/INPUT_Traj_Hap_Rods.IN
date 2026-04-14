@@ -1,0 +1,53 @@
+Input for HAPHETLN 
+particle trajectory model for happel sphere utilizing linear approximation 
+for heterogeneity calculation
+*****
+Flow and Geometry Parameters
+AG(m)		BETA1(m)        AP(m)		POROSITY(-)	VSUP(m/s)		RLIM(m)
+grain radius	aspect ratio     particle radius			superficial velocity		limiting radius for injection
+195.0E-6		6.0                  5.5032E-8	0.36		2.08333E-5		1.0E-7
+*****
+Physical Parameters of Materials
+RHOP(kg/m3)	RHOW(kg/m3)	VISC(kg/s/m2)	T(K)
+particle den.	water den.	viscosity	t	emperature
+1055.0		998.0		9.98E-4	  	298.2
+*****
+Elastic Parameters for Colloid
+BETA		KINT(N/m2)	
+hyst.loss fact. Young modulus	
+1.0		4.014E9		
+*****
+van der Waals and Steric Force Parameters
+A132(J)		LAMBDA(m)	W0(J/m2)	L0(m)		DELTASEP(m)
+Comb.Hamaker	vdW decay	Max steric	steric decay	buffer outward from minimum
+3.84E-21		1.0E-7		0.21	0.635E-10		5.0E-9
+*****
+Water Chemistry and Surface Charge Parameters
+IS(mol/m3)	ZI(-)		ZETACST(V)	ZETAP1(V)                     ZETAP2(V)			PCOV
+ionic strength	valence elect.	collector	colloid heterodomain1         colloid heterodomain2 	particle heterodomain patch (degree)
+1.0		-1.0		-53.5E-3		20.0E-3 	              20.0E-3			0.0
+*****
+Heterogeneity Parameters, (set NHETTILE to (0) no hetdomainS, (1) uniform single size (5) bimodal 1:4 large to small hetdomains)
+ZETAHET(V)	PSIZE		RHET0(m)		RHET1(m)		SCOV(-)		
+heterodomain	#het per tile	rad.large.het. 	rad.small.het.	fractional surface coverage			
+53.5E-3		0		1.2E-7		6.0E-8		0.0			
+*****
+Diffusion Force Scaling Parameter (Calibrated to 1.35)
+DIFFSCALE(-)
+multiplier of diffusion force		
+1.0			
+*****
+Gravity direction factor (-1.0 countercurrent with flow, 1.0 concurrent with flow, 0.0 no gravity)
+GRAVFACT(-)
+multiplier of gravity force		
+1.0			
+*****
+Simulation Parameters
+NPART		TTIME(s)	MULT		MULT2           MULT3		DFACT1(near surface)	DELTASEI
+#colloids	total sim. time	bulk dT mult.	NEARSURFACE     contact dT 	scale diff. disp.    	SEI increment
+30		5000		100.0		10.0            1.0		0.0			0.002
+*****
+Output Parameters
+NOUT		PRINTMAX	ATTMODE				CLUSTER	
+output interval	max. output	sep.(0) or contact(1) mode 	single(0) or parallel(1) simulation
+1000		5000		0				0

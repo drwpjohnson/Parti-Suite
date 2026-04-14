@@ -1,0 +1,2805 @@
+      PROGRAM HAPHETLN
+C     PROGRAM TO PLOT FLINES FROM HAPPEL FFIELD SUBROUTINE
+C     GENERATES LOCATION PER FLOW LINE
+C     USED TO PLOT IN  POV RAY  (NEED POST SCRIPT)
+C     
+
+C     DEFINE ARRAYS FIRST
+      DIMENSION XOT(5000000),YOT(5000000),ZOT(5000000)
+      DIMENSION Q0OT(5000000),Q1OT(5000000),Q2OT(5000000),Q3OT(5000000)
+      DIMENSION IOT(5000000),HOT(5000000)
+	DIMENSION THZOT(5000000),THXOT(5000000),THYOT(5000000)
+      DIMENSION PHIOT(5000000),THETAOT(5000000),PSIOT(5000000)
+      DIMENSION FLIFTXOT(5000000),FLIFTYOT(5000000),FLIFTZOT(5000000)
+      DIMENSION XDIFOT(5000000),YDIFOT(5000000),ZDIFOT(5000000)
+      DIMENSION WBARXOT(5000000),WBARYOT(5000000),WBARZOT(5000000)
+	DIMENSION FCOLLOT(5000000),FEDLOT(5000000),FVDWOT(5000000)
+	DIMENSION FDRGXOT(5000000),FDRGYOT(5000000),FDRGZOT(5000000)
+	DIMENSION WDIFXOT(5000000),WDIFYOT(5000000),WDIFZOT(5000000)
+	DIMENSION UXOT(5000000),UYOT(5000000),UZOT(5000000)
+	DIMENSION VXOT(5000000),VYOT(5000000),VZOT(5000000)
+	DIMENSION PTIMEFOT(5000000),AFRACTOT(5000000)
+	DIMENSION XATT(5000),YATT(5000)
+      DIMENSION seed(8),SEEDR(8)
+      DIMENSION XHET(10),YHET(10),ZHET(10),RHET(10)
+C
+      DOUBLE PRECISION XOT,YOT,ZOT
+      DOUBLE PRECISION Q0OT,Q1OT,Q2OT,Q3OT      
+      INTEGER IOT
+	DOUBLE PRECISION HOT,THZOT,THXOT,THYOT
+      DOUBLE PRECISION PHIOT,THETAOT,PSIOT
+      DOUBLE PRECISION FLIFTXOT,FLIFTYOT,FLIFTZOT
+      DOUBLE PRECISION XDIFOT,YDIFOT,ZDIFOT
+      DOUBLE PRECISION WBARXOT,WBARYOT,WBARZOT
+	DOUBLE PRECISION FCOLLOT,FEDLOT,FVDWOT
+	DOUBLE PRECISION FDRGXOT,FDRGYOT,FDRGZOT
+	DOUBLE PRECISION WDIFXOT,WDIFYOT,WDIFZOT
+	DOUBLE PRECISION UXOT,UYOT,UZOT
+	DOUBLE PRECISION VXOT,VYOT,VZOT
+	DOUBLE PRECISION FFRICTOT,PTIMEFOT,AFRACTOT
+	DOUBLE PRECISION XHET,YHET,ZHET,RHET,RHET0,RHET1,SCOV
+	DOUBLE PRECISION XATT,YATT
+      DOUBLE PRECISION seed,SEEDR
+C     
+C     DEFINE VARIABLES         
+      DOUBLE PRECISION AG,RB,POROSITY,PP,WW,ARC,ZARC,AP,VSUP
+      DOUBLE PRECISION K1,K2,K3,K4,VxH1,VyH1,VzH1,VTGRID,VNGRID
+      DOUBLE PRECISION VX,VY,VZ,XYDIS,BETA,GAMMA,PI,TGRID,NGRID
+      DOUBLE PRECISION GRID,RDIS,SHELL
+      DOUBLE PRECISION XGRID,YGRID,ZGRID,VXGRID,VYGRID,VZGRID
+      DOUBLE PRECISION X,Y,Z,R,dT,XINIT,YINIT,ZINIT,T,VN,VT
+      DOUBLE PRECISION PHIINIT,THETAINIT,PSIINIT
+      DOUBLE PRECISION TBULK,TNEAR,TRAJNEAR,DISPNEAR
+      DOUBLE PRECISION XRAND,YRAND
+      DOUBLE PRECISION rsign1,rnum1,rsign2,rnum2,rsign3,rnum3
+      DOUBLE PRECISION RINJ,RLIM
+      DOUBLE PRECISION XO,YO,ZO,Xm0,Ym0,Zm0,ZEXIT
+      DOUBLE PRECISION RCHK,STUCK
+      DOUBLE PRECISION XOUT,YOUT,ZOUT,H,HO
+      DOUBLE PRECISION dTMRT,VISC,MP,RHOP
+      DOUBLE PRECISION RHOW,G,ERE0,SIGMAC,ECHG,KB,MULT,MULT2,MULT3
+      DOUBLE PRECISION UX,UXO,UY,UYO,UZ,UZO
+      DOUBLE PRECISION HBAR,M3,M4,M5,STEP1,VM
+	DOUBLE PRECISION A1,B1,C1,D1,E1,A2,B2,C2,D2,E2,A3,B3,C3,D3,E3
+	DOUBLE PRECISION A4,B4,C4,D4,E4,FUN1,FUN2,FUN3,FUN4
+      DOUBLE PRECISION ZETAP1,ZETAP2,ZETAC,ZETACST,ZETAHET
+      DOUBLE PRECISION VTX,VTY,VTZ,VNX,VNY,VNZ
+      DOUBLE PRECISION A132,FEDL,IS,ZI,FVDW,KAPPA,LAMBDA
+      DOUBLE PRECISION FG,FGN,FGNX,FGNY,FGNZ,FGT,FGTX,FGTY,FGTZ
+      DOUBLE PRECISION FCOLL,FCOLLX,FCOLLY,FCOLLZ,FSTE,FBORN
+      DOUBLE PRECISION FDRG,FDRGN,FDRGNX,FDRGNY,FDRGNZ
+      DOUBLE PRECISION FRDRGN,FRDRGNX,FRDRGNY,FRDRGNZ              !KE FOR RESISTING DRAG FORCE,TEST RUN
+      DOUBLE PRECISION FDRGT,FDRGTX,FDRGTY,FDRGTZ
+      DOUBLE PRECISION FRDRGT,FRDRGTX,FRDRGTY,FRDRGTZ                     !KE FOR RESISTING DRAG FORCE,TEST RUN
+      DOUBLE PRECISION FDIFX,FDIFY,FDIFZ
+      DOUBLE PRECISION FDIFN,FDIFNX,FDIFNY,FDIFNZ
+      DOUBLE PRECISION FDIFT,FDIFTX,FDIFTY,FDIFTZ
+      DOUBLE PRECISION FLIFTt,FLIFTX,FLIFTY,FLIFTZ
+      DOUBLE PRECISION DIFFSCALE,TINJ,PTIMEF,PTIME,ETIME,TTIME
+      DOUBLE PRECISION UTZ,UTZO,UTY,UTYO,UTX,UTXO,UNZ,UNZO,UNY,UNYO
+      DOUBLE PRECISION UNX,UNXO,UN
+      DOUBLE PRECISION ENX,ENY,ENZ,ETX,ETY,ETZ
+      DOUBLE PRECISION WO,LO,KINT,DELTASEP,RZOI,AZOI,NIO
+      DOUBLE PRECISION FDRGX,FDRGY,FDRGZ,AFRACT,AF            
+      DOUBLE PRECISION FRDRGX,FRDRGY,FRDRGZ                            !KE FOR RESISTING DRAG FORCE,TEST RUN
+      DOUBLE PRECISION ACONT,CORF,EVDW,EEDL,EEDLHET,EEDLCST     
+      DOUBLE PRECISION ECOLL,FNORM,HFRIC,HMIN,FMIN,TFRIC
+      DOUBLE PRECISION XP,YP,ZP,FEDLHET,FEDLCST,GRAVFACT,PCOV
+      DOUBLE PRECISION XREF1,YREF1,ZREF1,TREF1,DREF1,DIND1,DFACT1
+      DOUBLE PRECISION XREF2,YREF2,ZREF2,TREF2,DREF2,DIND2,DELTASEI
+C
+      CHARACTER DUMMY*20
+      CHARACTER FILESINGLE*25
+C
+      INTEGER I,J,K,N,ICOUNT,GRIDCOUNT,FF2D,nrand,PCOUNT,INTFLAG 
+      INTEGER OUTCOUNT,NPART,NOUT,CLUSTER,SECCOUNT,ATTACHK,POUT
+      INTEGER OUTMAX,OUTFLAG,PRINTMAX,NPRINT,NPARTLOOP,RMULT,ATTMODE
+      INTEGER IREF1,IREF2,PSIZE,HCHK,FLAG
+C
+********************ADDED BY KE TO ACCOUNT SHPAE EFFECT******************DELTAZO
+      DOUBLE PRECISION U(3),V(3),UBAR(3),VBAR(3),FDRAG(3),TDLVO(3)     !TDLVO IS THE COLLOIDAL TORQUE
+      DOUBLE PRECISION, DIMENSION(3,3) :: KBAR,KDBLBAR,TRANSPOSEA    !TRANSPOSEA= TRANSPOSE(MATRIX_A)
+      DOUBLE PRECISION, DIMENSION(3,3) :: MATRIX_A,MATMUL1,TD1,TD2,TD3 !MATMUL1= MATMUL(KBAR,MATRIX_A),TD ARE ROTATIONAL DIFFUSION
+      DOUBLE PRECISION, DIMENSION(1000,1000) :: PATCH
+      DOUBLE PRECISION BETA1,RSPHERE,SA,FLIFT(3)                       !ASPECT RATIO BETA, EQUIVALENT SPHERE RADIUSDOUBLE PRECISION BETA1,RSPHERE
+      DOUBLE PRECISION Q0,Q1,Q2,Q3,Q0O,Q1O,Q2O,Q3O,Q0O1,Q1O1,Q2O1,Q3O1 !EULER'S FOUR PARAMETERS
+      DOUBLE PRECISION PHI,THETA,PSI,QE,Q0C                                !EULER'S THREE ANGLES,QE is the error translating Qs
+      DOUBLE PRECISION dTO,DELTAZO1,DELTAXO1,DELTAYO1
+      DOUBLE PRECISION DELTAZO,DELTAXO,DELTAYO
+      DOUBLE PRECISION AZIMUTH,INCLINATION,RROD,LAMBDA1                !ROD SHAPE CALCULATING SEPERATION DISTANCE
+      DOUBLE PRECISION ALPHA0,BETA0,GAMMA0                             !HYDRODYNAMIC TORQUE PARAMETERS (ZHANG ET AL,2001)
+      DOUBLE PRECISION TMULT1X,TMULT2X,TMULT1Y,TMULT2Y,TMULTZ
+      DOUBLE PRECISION IX,IY,IZ,Wzy,Wxz,Wyx                            !MOMENT OF INERTIA AND VELOCITY GRADIANT PARAMETERS
+      DOUBLE PRECISION WBARX,WBARY,WBARZ,WBARXO,WBARYO,WBARZO          !ANGULAR VELOCITY IN PARTICLE FRAME
+      DOUBLE PRECISION XDIF,YDIF,ZDIF,WDIFX,WDIFY,WDIFZ
+      DOUBLE PRECISION XDIFO,YDIFO,ZDIFO,WDIFXO,WDIFYO,WDIFZO
+      DOUBLE PRECISION DELTAWX,DELTAWY,DELTAWZ, RSF
+      DOUBLE PRECISION COEFTHETA,THX,THY,THZ,THDBLBAR(3),TDLVODBLBAR(3)!HYDRODYNAMIC DRAG,DBLBAR FOR COMOVING FRAM
+      DOUBLE PRECISION LR,PA(3),PABAR(3),DA,CURV,HSF,TH(3),DELTAH      !ROUGHNESS LAYER,POINT OF DEFORMATION,DEFORMATION RADIUS,CURVATURE,SUPPORTING FUNCTION OF ELLIPSOID
+      DOUBLE PRECISION LDRVNG,LADH,TDRVNG,TADH,TCTR,FGRPN,FGRPT       !LEVEL AND TORQUE OF DRIVING FORCES AND ADHESIVE FORCES
+C 20160709
+      real*16 :: AH0(3),AH1(3),AH2(2),YH1(3),B(3) 
+      real*16, DIMENSION(3,3):: A
+      real*16 :: H1,H2,XS,YS,ZS,APS                             !PARAMETERS TO CALCULATE SEPERATION DISTANCE
+      real*16 :: CBRT=1.q0/3.q0
+      
+C        In order to use adam integration scheme, previous two time step is recorded, 
+C        so as 'deltaXO'for h*u in 'Xn+2= Xn+1+1.5*h*u(t=n+1)-0.5*h*u(t=n)' is recorded.
+      
+********************ADDED BY KE TO ACCOUNT SHPAE EFFECT END******************
+      	!MC variables declaration, these are need for the cluster version dont delete
+      character*40 argv
+      character*40 filenam
+      integer ipart,ilen
+      character*6 chri
+      character*10 date, time, zone
+      integer iarray(8)
+C
+      DATA OUTMAX/5000000/
+      DATA PI/3.141592653589793d0/
+	DATA G/9.81/,ERE0/7.083E-10/
+	DATA ECHG/1.60E-19/,KB/1.381E-23/
+	DATA SIGMAC/5.0E-10/
+C
+C     READ INPUT FILE
+1000  FORMAT (3/)
+	OPEN (UNIT=1,FILE='INPUT.IN',STATUS='OLD')
+      DO I=1,7 !SKIP 7 FIRST LINES (HEADER)
+      READ (1,*)    
+      END DO
+      READ (1,*) AG,BETA1,AP,POROSITY,VSUP,RLIM
+      READ (1,1000)
+      READ (1,*) RHOP,RHOW,VISC,T
+      READ (1,1000)
+      READ (1,*) BETA,KINT
+      READ (1,1000)
+      READ (1,*) A132,LAMBDA,WO,LO,DELTASEP
+      READ (1,1000)
+      READ (1,*) IS,ZI,ZETACST,ZETAP1,ZETAP2,PCOV
+      READ (1,1000)
+      READ (1,*) ZETAHET,PSIZE,RHET0,RHET1,SCOV
+      READ (1,1000)
+      READ (1,*) DIFFSCALE
+      READ (1,1000)
+      READ (1,*) GRAVFACT
+      READ (1,1000)
+      READ (1,*) NPART,TTIME,MULT,MULT2,MULT3,DFACT1,DELTASEI
+      READ (1,1000)
+      READ (1,*) NOUT,PRINTMAX,ATTMODE,CLUSTER
+C
+
+
+C     SET CENTER OF COLLECTOR
+      Xm0 = 0.0
+      Ym0 = 0.0
+      Zm0 = 0.0
+C     INITIALIZE ENX,ENY,ENZ TO CALCULATE HFRICT      
+      ENX=0.0
+      ENY=0.0
+      ENZ=1.0
+C       EULER'S FOUR PARAMETERS AND ANGLES, INITIALIZATION USING Z-Y-Z CONVENTION
+C        WE INITIALIZED THE ORIENTATION TO BE SIDEON TO GET A MAXIMUM INTERACTION                     
+        PHI = 0.0 
+        THETA = PI/2.0 
+        PSI = 0.0 
+        Q0 = COS((PHI+PSI)/2.0)*COS(THETA/2.0)
+        Q1 = COS((PHI-PSI)/2.0)*SIN(THETA/2.0)
+        Q2 = SIN((PHI-PSI)/2.0)*SIN(THETA/2.0)
+        Q3 = SIN((PHI+PSI)/2.0)*COS(THETA/2.0)
+        MATRIX_A(1,1)= 1.0-2.0*(Q2**2+Q3**2.0)
+        MATRIX_A(1,2)= 2.0*(Q1*Q2+Q3*Q0)
+        MATRIX_A(1,3)= 2.0*(Q1*Q3-Q2*Q0)
+        MATRIX_A(2,1)= 2.0*(Q2*Q1-Q3*Q0)
+        MATRIX_A(2,2)= 1.0-2.0*(Q3**2.0+Q1**2.0)
+        MATRIX_A(2,3)= 2.0*(Q2*Q3+Q1*Q0)
+        MATRIX_A(3,1)= 2.0*(Q3*Q1+Q2*Q0)
+        MATRIX_A(3,2)= 2.0*(Q3*Q2-Q1*Q0)
+        MATRIX_A(3,3)= 1.0-2.0*(Q1**2.0+Q2**2.0)
+C        
+C    DEVIDED BY ZERO, IF BETA1=1 FOR SPHERE
+        IF (BETA1.EQ.1.0)THEN
+            KBAR(1,1)=1.0
+            KBAR(2,2)=1.0
+            KBAR(3,3)=1.0
+            ALPHA0=2.d0/3.d0
+            BETA0=2.d0/3.d0
+            GAMMA0=2.d0/3.d0
+        ELSE
+C    KBAR MATRIX IN HYDRODANAMIC DRAG              
+          KBAR(1,1)=8.d0/3.d0*(BETA1**2.0-1.0)/((2.0*BETA1**2.0-3.0)/
+     &             (BETA1**2.0-1.0)**0.5*LOG(BETA1+(BETA1**2.0-1.0)
+     &             **0.5)+BETA1)
+          KBAR(2,2)=8.d0/3.d0*(BETA1**2.0-1.0)/((2.0*BETA1**2.0-3.0)/
+     &             (BETA1**2.0-1.0)**0.5*LOG(BETA1+(BETA1**2.0-1.0)
+     &             **0.5)+BETA1)
+          KBAR(3,3)=4.d0/3.d0*(BETA1**2.0-1.0)/((2.0*BETA1**2.0-1.0)/
+     &             (BETA1**2.0-1.0)**0.5*LOG(BETA1+(BETA1**2.0-1.0)
+     &             **0.5)-BETA1)
+C   HYDRODYNAMIC TORQUE PARAMETERS          
+          ALPHA0=BETA1*BETA1/(BETA1*BETA1-1.0)+BETA1/2.0/(BETA1*BETA1
+     &           -1.0)**(3.0/2.0)*LOG((BETA1-(BETA1*BETA1-1)**
+     &            (1.0/2.0))/(BETA1+(BETA1*BETA1-1.0)**(1.0/2.0))) 
+          BETA0=ALPHA0
+          GAMMA0=-2.0/(BETA1*BETA1-1.0)-BETA1/(BETA1*BETA1-1.0)
+     &            **(3.0/2.0)*LOG((BETA1-(BETA1*BETA1-1.0)**(1.0/2.0))
+     &            /(BETA1+(BETA1*BETA1-1.0)**(1.0/2.0)))
+      END IF   
+C
+C     CALCULATE MASS OF PARTICLE
+      MP = (4.d0/3.d0)*(PI)*(AP**3)*BETA1*RHOP      ! ADDED BY KE TO ACCOUNT SHPAE EFFECT 
+C    CALCULATE MOMENTS OF INERTIA  		
+      IX=AP*AP*(1+BETA1*BETA1)*MP/5.0		
+      IY=IX		
+      IZ=2.0*AP*AP*MP/5.0
+C	CALCULATE MOMEMTUM RELAXATION TIME 
+	dTMRT = MP/(6.0*3.1416*VISC*AP)
+C     SET TIME STEP
+      dT = MULT*dTMRT  
+C     SET VIRTUAL MASS COEFFICIENT
+      VM = (2.d0/3.d0)*PI*(AP**3.0)*BETA1*RHOW      ! ADDED BY KE TO ACCOUNT SHPAE EFFECT 
+C     EQUIVALENT SPHERE RADIUS BASED ON VOLUME
+      RSPHERE=AP*BETA1**(CBRT)
+C     Equivalent Stokes Sphere Radius (Tian et al 2012)
+      RSF=3.0*AP*(BETA1/3.0/(KBAR(1,1)+KBAR(2,2)+KBAR(3,3)))**0.5
+C     SET DRAG FORCE COEFFICIENT
+	M3 = 6.0*PI*VISC*AP
+C     SET TORQUE COEFFICIENT
+      M4 = 8.0*PI*VISC*AP
+      M5 = 4*PI*VISC*AP
+C     CALCULATE Happel sphere-in-cell model analytical streamline function parameters (from Rajagopalan & Tien, 1976)
+	PP = (1-POROSITY)**(CBRT)
+	WW = 2.0-3.0*PP+3.0*PP**5.0-2.0*PP**6.0
+	K1 = 1/WW
+      K2 = -(3.0+2.0*PP**5.0)/WW
+	K3 = (2.0+3.0*PP**5.0)/WW
+	K4 = -PP**5.0/WW
+C     FLUID SHELL RADIUS
+	RB = AG/((1-POROSITY)**(CBRT))
+C     FLUID SHELL THICKNESS
+      SHELL = RB-AG
+C     CALCULATE KAPPA NOTE: IS FOR 1:1 ELECTROLYTE ONLY
+ 	NIO = IS*2*6.023E23
+	KAPPA = ((ECHG**2.0)*NIO*(ZI**2.0)/(ERE0*KB*T))**0.5      
+C     CALCULATE RZOI: radius of zone of influence
+      RZOI = 2.0*((1/KAPPA)*AP)**0.5  
+C     CALCULATE AZOI: area of zone of influence
+      AZOI =  3.1416*(RZOI*RZOI)
+C     
+C     CALCULATE CHARACTERISTIC FORCE MINIMUM WHEN VDW, EDL, AND STERIC FORCES ARE CONSIDERED FOR FAVORABLE CONDITIONS
+      IF ((ZETACST*ZETAP1).LT.0.0) THEN
+        ZETAC = ZETACST
+      ELSE
+        ZETAC = -1.0*ZETACST
+      ENDIF
+      H=1.0E-10
+      FCOLLO = 0.0
+      DO WHILE (H.LT.3.0E-9)
+          X=Xm0
+          Y=Ym0
+          Z=Zm0+AP+AG+H
+        CALL FORCEDLVO (KAPPA,H,PI,FEDL,FVDW,
+     & KB,ERE0,ECHG,ZETAC,ZETAP1,ZETAP2,AP,BETA1,A132,
+     & MATRIX_A,ENX,ENY,ENZ,X,Y,Z,TDLVO,DELTASEI,PCOV,AG,PATCH)
+        CALL FORCESTE (PI,WO,LO,AP,AG,H,FSTE)
+        CALL FORCEBORN (A132,SIGMAC,AP,H,FBORN)
+        FCOLL = FVDW+FEDL+FSTE+FBORN
+        IF ( FCOLL.LT.FCOLLO) THEN
+            FMIN = FCOLL
+            HMIN = H
+        END IF
+        FCOLLO = FCOLL
+        H = H + 1.0E-10
+      END DO  
+C     SET DISTANCE AT WHICH SURFACE FRICTION APPLIES (CONTACT)
+      HFRIC = HMIN + DELTASEP                   
+C	SET COEFFICIENTS FOR UNIVERSAL HYDRODYNAMIC FUNCTIONS -UPDATED- JAN 2012
+	A1=-0.443
+	B1=-1.299
+	C1=-0.5568
+	D1=-0.32
+	E1=0.75
+C
+	A2=1.455
+	B2=-1.259
+	C2=0.7951
+	D2=-0.56
+	E2=0.50 
+C
+	A3=-0.5
+	B3=-2.5
+	C3=-0.3
+	D3=-20.0
+	E3=0.4
+C
+	A4=-0.42
+	B4=-0.35
+	C4=-0.40
+	D4=-10.0
+	E4=0.80
+
+C     OPEN FLUX FILES
+      IF (CLUSTER.EQ.0) THEN
+C	    OPEN HAPHETFLUXEX.OUT FOR OUTPUT
+		  OPEN (UNIT=31,FILE='FLUXEX.OUT',STATUS='REPLACE')
+C	    OPEN HAPHETFLUXATT.OUT FOR OUTPUT
+	 	  OPEN (UNIT=32,FILE='FLUXATT.OUT',STATUS='REPLACE')
+C	    OPEN HETJETFLUXREM.OUT FOR OUTPUT
+	    OPEN (UNIT=33,FILE='FLUXREM.OUT',STATUS='REPLACE')
+C         EXIT FLUX FILE, UNIT=31
+          WRITE (31,101) RB,AG,AP,TTIME,NPART,VSUP
+          WRITE (31,102) POROSITY,ZETACST,ZETAP1,ZETAP2,ZETAHET,SCOV,
+     &    MULT,MULT2,MULT3,dTMRT
+          WRITE (31,103) IS,BETA,KINT,LO,WO,RZOI
+          WRITE (31,104) RLIM,ATTMODE
+          WRITE (31,105)
+          WRITE (31,206) 
+C         ATTACHMENT FLUX FILE, UNIT=32
+          WRITE (32,101) RB,AG,AP,TTIME,NPART,VSUP
+          WRITE (32,102) POROSITY,ZETACST,ZETAP1,ZETAP2,ZETAHET,SCOV,
+     &    MULT,MULT2,MULT3,dTMRT
+          WRITE (32,103) IS,BETA,KINT,LO,WO,RZOI
+          WRITE (32,104) RLIM,ATTMODE
+          WRITE (32,105)
+          WRITE (32,206) 
+C         REMAINING FLUX FILE, UNIT=33
+          WRITE (33,101) RB,AG,AP,TTIME,NPART,VSUP
+          WRITE (33,102) POROSITY,ZETACST,ZETAP1,ZETAP2,ZETAHET,SCOV,
+     &    MULT,MULT2,MULT3,dTMRT
+          WRITE (33,103) IS,BETA,KINT,LO,WO,RZOI
+          WRITE (33,104) RLIM,ATTMODE
+          WRITE (33,105)
+          WRITE (33,206)  
+      ENDIF
+C
+C     TRAJECTORY LOOP
+C      SET NUMBER OF PARTICLES TO 1 IF IN PARALLEL VERSION
+      IF (CLUSTER.EQ.1) THEN
+        NPARTLOOP = 1
+!MC read number of particles and ID of particle as a program argument for the cluster version    
+        call getarg(1,argv)
+        read(argv,*)npart
+        call getarg(2,argv)
+        read(argv,*)ipart
+      ELSE
+        NPARTLOOP = NPART
+      ENDIF
+C
+
+C          
+C	*****************OPEN THE SIX OUTPUT FILES**** PARALLEL VERSION ****************************
+C    THESE NEED TO BE OPEN OUTSIDE THE LOOP TO AVOID MULTIPLES UNITS BEING WRITTEN TO SIMULTANEOUSLY 
+C    REMOVE THE !! FROM THE LINES IN THE LINES IN THE SECTION BELOW FOR THE CLUSTER VERSION		
+	IF (CLUSTER.EQ.1) THEN 
+C	OPEN HAPHETTRAJEX.OUT FOR OUTPUT
+        filenam='HAPHETTRAJEX.'//chri(ipart)//'.OUT'
+        call chrpak(filenam,40,ilen)
+        OPEN (UNIT=11,FILE=filenam,STATUS='REPLACE')
+C	OPEN HAPHETTRAJATT.OUT FOR OUTPUT
+        filenam='HAPHETTRAJATT.'//chri(ipart)//'.OUT'
+        call chrpak(filenam,40,ilen)
+        OPEN (UNIT=12,FILE=filenam,STATUS='REPLACE')
+C	OPEN HAPHETTRAJREM.OUT FOR OUTPUT
+        filenam='HAPHETTRAJREM.'//chri(ipart)//'.OUT'
+        call chrpak(filenam,40,ilen)
+        OPEN (UNIT=13,FILE=filenam,STATUS='REPLACE')
+C	OPEN HAPHETFLUXEX.OUT FOR OUTPUT
+        filenam='HAPHETFLUXEX.'//chri(ipart)//'.OUT'
+        call chrpak(filenam,40,ilen)
+        OPEN (UNIT=21,FILE=filenam,STATUS='REPLACE')
+C	OPEN HAPHETFLUXATT.OUT FOR OUTPUT
+        filenam='HAPHETFLUXATT.'//chri(ipart)//'.OUT'
+        call chrpak(filenam,40,ilen)
+        OPEN (UNIT=22,FILE=filenam,STATUS='REPLACE')
+C	OPEN HAPHETFLUXREM.OUT FOR OUTPUT
+        filenam='HAPHETFLUXREM.'//chri(ipart)//'.OUT'
+        call chrpak(filenam,40,ilen)
+        OPEN (UNIT=23,FILE=filenam,STATUS='REPLACE')
+      END IF
+C
+C *****************END OPEN THE SIX OUTPUT FILES****** PARALLEL VERSION **********************C
+C
+C ****** LOOP THROUGH PARTICLES   
+      DO J = 1,NPARTLOOP
+	IF (CLUSTER.EQ.0) THEN
+        ipart = J	
+C	*****************OPEN THE SIX OUTPUT FILES**** SINGLE CORE VERSION ****************************	
+C	OPEN HAPHETTRAJEX.OUT FOR OUTPUT
+1001		FORMAT ('HAPHETTRAJEX.',I0,'.OUT')
+		WRITE(FILESINGLE,1001) J
+		OPEN (UNIT=11,FILE=FILESINGLE,STATUS='REPLACE')
+C	OPEN HAPHETTRAJATT.OUT FOR OUTPUT
+1002		FORMAT ('HAPHETTRAJATT.',I0,'.OUT')
+		WRITE(FILESINGLE,1002) J
+		OPEN (UNIT=12,FILE=FILESINGLE,STATUS='REPLACE')
+C	OPEN HETJETTRAJATT.OUT FOR OUTPUT
+1003		FORMAT ('HAPHETTRAJREM.',I0,'.OUT')
+		WRITE(FILESINGLE,1003) J
+		OPEN (UNIT=13,FILE=FILESINGLE,STATUS='REPLACE')
+C	OPEN HAPHETFLUXEX.OUT FOR OUTPUT	
+2001		FORMAT ('HAPHETFLUXEX.',I0,'.OUT')
+		WRITE(FILESINGLE,2001) J
+		OPEN (UNIT=21,FILE=FILESINGLE,STATUS='REPLACE')	
+C	OPEN HAPHETFLUXATT.OUT FOR OUTPUT		
+2002		FORMAT ('HAPHETFLUXATT.',I0,'.OUT')
+		WRITE(FILESINGLE,2002) J
+		OPEN (UNIT=22,FILE=FILESINGLE,STATUS='REPLACE')
+C	OPEN HAPHETFLUXREM.OUT FOR OUTPUT	
+2003		FORMAT ('HAPHETFLUXREM.',I0,'.OUT')
+		WRITE(FILESINGLE,2003) J
+		OPEN (UNIT=23,FILE=FILESINGLE,STATUS='REPLACE')
+C	*****************OPEN THE SIX OUTPUT FILES**** SINGLE CORE VERSION  END **********************	
+	END IF
+C
+C*************************WRITE HEADERS*********************************************
+C     WRITE FORMAT 101-105 FOR BOTH FLUX AND TRAJECTORY FILE (COMMON HEADER)
+C     EXIT TRAJECTORY FILE, UNIT=11
+      WRITE (11,101) RB,AG,AP,TTIME,NPART,VSUP
+      WRITE (11,102) POROSITY,ZETACST,ZETAP1,ZETAP2,ZETAHET,SCOV,
+     &               MULT,MULT2,MULT3,dTMRT
+      WRITE (11,103) IS,BETA,KINT,LO,WO,RZOI
+      WRITE (11,104) RLIM,ATTMODE
+C     ATTACHMENT TRAJECTORY FILE, UNIT=12
+      WRITE (12,101) RB,AG,AP,TTIME,NPART,VSUP
+      WRITE (12,102) POROSITY,ZETACST,ZETAP1,ZETAP2,ZETAHET,SCOV,
+     &               MULT,MULT2,MULT3,dTMRT
+      WRITE (12,103) IS,BETA,KINT,LO,WO,RZOI
+      WRITE (12,104) RLIM,ATTMODE
+C     REMAINING TRAJECTORY FILE, UNIT=13
+      WRITE (13,101) RB,AG,AP,TTIME,NPART,VSUP
+      WRITE (13,102) POROSITY,ZETACST,ZETAP1,ZETAP2,ZETAHET,SCOV,
+     &               MULT,MULT2,MULT3,dTMRT
+      WRITE (13,103) IS,BETA,KINT,LO,WO,RZOI
+      WRITE (13,104) RLIM,ATTMODE
+C  
+C     EXIT FLUX FILE, UNIT=21
+      WRITE (21,101) RB,AG,AP,TTIME,NPART,VSUP
+      WRITE (21,102) POROSITY,ZETACST,ZETAP1,ZETAP2,ZETAHET,SCOV,
+     &               MULT,MULT2,MULT3,dTMRT
+      WRITE (21,103) IS,BETA,KINT,LO,WO,RZOI
+      WRITE (21,104) RLIM,ATTMODE
+      WRITE (21,105)
+      WRITE (21,206) 
+C     ATTACHMENT FLUX FILE, UNIT=22
+      WRITE (22,101) RB,AG,AP,TTIME,NPART,VSUP
+      WRITE (22,102) POROSITY,ZETACST,ZETAP1,ZETAP2,ZETAHET,SCOV,
+     &               MULT,MULT2,MULT3,dTMRT
+      WRITE (22,103) IS,BETA,KINT,LO,WO,RZOI
+      WRITE (22,104) RLIM,ATTMODE
+      WRITE (22,105)
+      WRITE (22,206) 
+C     REMAINING FLUX FILE, UNIT=23
+      WRITE (23,101) RB,AG,AP,TTIME,NPART,VSUP
+      WRITE (23,102) POROSITY,ZETACST,ZETAP1,ZETAP2,ZETAHET,SCOV,
+     &               MULT,MULT2,MULT3,dTMRT
+      WRITE (23,103) IS,BETA,KINT,LO,WO,RZOI
+      WRITE (23,104) RLIM,ATTMODE
+      WRITE (23,105)
+      WRITE (23,206)   
+C      
+101	FORMAT ('RB(m)= ',E15.7,2X,
+     &'AG(m)= ',E15.7,2X,'AP(m)= ',E15.7,2X,
+     &'TTIME(s)= ',E15.7,2X,'NPART= ',I6,2X,'VSUP(ms-1)= ',E15.7)
+102   FORMAT ('POROSITY= ',E15.7,2X,'ZETACST(V)= ',E15.7,2X,
+     &'ZETAP1(V)= ',E15.7,2X,'ZETAP2(V)= ',E15.7,2X,'ZETAHET(V)= ',
+     &E15.7,2X,'SCOV= ',E15.7,2X,'MULT= ',E15.7,2X,'MULT2= ',E15.7,2X,
+     &'MULT3= ',E15.7,2X,'dTMRT(s)= ',E15.7)
+103   FORMAT ('IS(mol/m3)= ',E15.7,2X,
+     &'BETA= ',E15.7,2X,'KINT= ',E15.7,2X,
+     &'LAMBDA0(m)= 'E15.7,2X,'W0(J/m2)= ',E15.7,2X,'RZOI(m)= ',E15.7)
+104	FORMAT ('RLIM= ',E15.7,2X,'ATTMODE(0=SEP,1=TORQUE)=',I5,2X,
+     &        'ATTACHK1=EXIT
+     &         ATTACHK2=ATTACHED-BY-SEP-OR-TORQUE
+     &         ATTACHK3=REMAINING-IN-BULK
+     &         ATTACHK4=TORQUE-W-SLOW-MOTION
+     &         ATTACHK5=REMAINING-IN-NEAR-SURFACE')
+105   FORMAT ('ATTACHK= ',I5) 
+C     USE LABEL FORMAT 106 AND WRITE VARIABLES FORMAT 107 FOR TRAJECTORY FILES
+106   FORMAT ('X',14X,'Y',14X,'Z',14X,'I',14X,'H',14X,
+     &  'Q0',13X,'Q1',13X,'Q2',13X,'Q3',13X,
+     &   'PHI',12X,'THETA',10X,'PSI',12X,
+     &  'FCOLL',10X,'FEDL',11X,'FVDW',11X,
+     &  'FDRGX',10X,'FDRGY',10X,'FDRGZ',10X,
+     &  'WDIFX',10X,'WDIFY',10X,'WDIFZ',10X,
+     &  'WBARX',10X,'WBARY',10X,'WBARZ',10X,
+     &  'XDIF',10X,'YDIF',10X,'ZDIF',10X,
+     &  'THX',12X,'THY',12X,'THZ',12X,
+     &  'FLIFTX',9X,'FLIFTY',9X,'FLIFTZ',9X,
+     &  'UX',13X,'UY',13X,'UZ',13X,
+     &  'VX',13X,'VY',13X,'VZ',13X,
+     &  'PTIMEF',9X,'AFRACT') 
+107   FORMAT (E15.7,14X,E15.7,14X,E15.7,14X,I15,14X,E15.7,14X,
+     &  E15.7,13X,E15.7,13X,E15.7,13X,E15.7,13X, 
+     &  E15.7,14X,E15.7,14X,E15.7,14X,             !PHI,THETA,PSI
+     &  E16.6,10X,E16.6,10X,E16.6,10X,
+     &  E15.7,10X,E15.7,10X,E15.7,10X,
+     &  E15.7,10X,E15.7,10X,E15.7,10X,
+     &  E15.7,10X,E15.7,10X,E15.7,10X,
+     &  E15.7,10X,E15.7,10X,E15.7,10X,            !TDLVO
+     &  E15.7,10X,E15.7,10X,E15.7,10X,            !TH
+     &  E15.7,10X,E15.7,10X,E15.7,10X,            !FLIFT 
+     &  E15.7,10X,E15.7,10X,E15.7,10X,
+     &  E15.7,10X,E15.7,10X,E15.7,10X,
+     &  E15.7,9X,E15.7) 
+C     USE LABEL FORMAT 206 AND WRITE VARIABLES FORMAT 207 FOR FLUX FILES      
+206   FORMAT ('PARTICLE',10X,'HINIT(m)',12X,'XINIT(m)',11X,'YINIT(m)'
+     &,12X,'ZINIT(m)',12X,
+     &'Q0INIT(m)',11X,'Q1INIT(m)',11X,'Q2INIT(m)',11X,'Q3INIT(m)',11X,
+     &'RINJ(M)',13X,'HOUT(m)',13X,'XOUT(m)',14X,
+     &'YOUT(m)',13X,'ZOUT(m)',13X,
+     &'Q0OUT(m)',12X,'Q1OUT(m)',12X,'Q2OUT(m)',12X,'Q3OUT(m)',12X, 
+     &'PTIMEIN(s)',9X,'PTIMEOUT(s)',9X,
+     &'ETIME(s)',11X,'TBULK(s)',16x,'TNEAR(s)',10x,'TFRIC',10x,'TRAJNEAR
+     &',10X,'DISPNEAR',10X,'SECCOUNT',10X,'ATTACHK',10X,'AFRACT')
+207   FORMAT (I7,10X,E15.7,12X,E15.7,11X,E15.7
+     &,12X,E15.7,12X
+     &,E15.7,11X,E15.7,11X,E15.7,11X,E15.7,11X
+     &,E15.7,13X,E15.7,13X,E15.7,14X,
+     &E15.7,13X,E15.7,13X,
+     &E15.7,12X,E15.7,12X,E15.7,12X,E15.7,12X,
+     &E15.7,9X,E15.7,9X,
+     &E15.7,11X,E15.7,16x,E15.7,10x,E15.7,10X,E15.7,
+     &10X,E15.7,10X,I15,10X,I5,10X,E15.7)
+C************************END WRITE HEADERS*********************************************
+C	SET INITIAL PARTICLE TIME (EVENLY DISTRIBUTED THROUGH TIME FOR FLUX) SET MAXIMUM INJECTION TIME HALF OF TOTAL SIMULATION TIME
+        TINJ = TTIME/6.0
+        PTIMEF = (ipart-1)*TINJ/NPART
+
+C     INITIALIZE RANDOM NUMBER GENERATOR SEED
+      CALL init_random_seed()
+      CALL HETPATCH (DELTASEI,PATCH,PI,SCOV,PSIZE,AP,BETA1)
+C      INITIALIZE LOCATION OF PARTICLES
+C      INITIALIZE ALSO DIFFERENT SEEDS FOR DIFFERENT PARTICLES IF IN PARALLEL VERSION SINCE 
+C      THE INITIAL SUBROUTINE INITIALIZES THE RANDOM NUMBER GENERATOR SEQUENCE
+            CALL INITIAL (XINIT,YINIT,ZINIT,PHIINIT,THETAINIT
+     &           ,PSIINIT,PI,BETA1,AP,MATRIX_A
+     &           ,Q0,Q1,Q2,Q3,H,RLIM,RB,RINJ)    
+C            
+        X = XINIT
+        Y = YINIT
+        Z = ZINIT
+C        
+        PHI = PHIINIT
+        THETA = THETAINIT
+        PSI = PSIINIT
+        Q0 = COS((PHI+PSI)/2.0)*COS(THETA/2.0)
+        Q1 = COS((PHI-PSI)/2.0)*SIN(THETA/2.0)
+        Q2 = SIN((PHI-PSI)/2.0)*SIN(THETA/2.0)
+        Q3 = SIN((PHI+PSI)/2.0)*COS(THETA/2.0)
+        MATRIX_A(1,1)= 1.0-2.0*(Q2**2+Q3**2.0)
+        MATRIX_A(1,2)= 2.0*(Q1*Q2+Q3*Q0)
+        MATRIX_A(1,3)= 2.0*(Q1*Q3-Q2*Q0)
+        MATRIX_A(2,1)= 2.0*(Q2*Q1-Q3*Q0)
+        MATRIX_A(2,2)= 1.0-2.0*(Q3**2.0+Q1**2.0)
+        MATRIX_A(2,3)= 2.0*(Q2*Q3+Q1*Q0)
+        MATRIX_A(3,1)= 2.0*(Q3*Q1+Q2*Q0)
+        MATRIX_A(3,2)= 2.0*(Q3*Q2-Q1*Q0)
+        MATRIX_A(3,3)= 1.0-2.0*(Q1**2.0+Q2**2.0)
+        Q0O = Q0
+        Q1O = Q1
+        Q2O = Q2
+        Q3O = Q3
+        Q0O1 = Q0O
+        Q1O1 = Q1O
+        Q2O1 = Q2O
+        Q3O1 = Q3O
+        dTO=dT
+        DELTAXO=0.0
+        DELTAYO=0.0        
+        DELTAZO=0.0
+        DELTAZO1=0.0
+        DELTAXO1=0.0
+        DELTAYO1=0.0
+        WDIFX=0.0
+        WDIFY=0.0
+        WDIFZ=0.0
+        DELTAWX=0.0
+        DELTAWY=0.0
+        DELTAWZ=0.0      
+C       CALCUATE SEPARATION DISTANCE REAL UNITS 
+        H = ((XINIT*XINIT+YINIT*YINIT+ZINIT*ZINIT)**0.5)-AG-AP 
+C       RESTART TRANSLATION AND OUTPUT COUNTERS
+        I = 1
+        PCOUNT = 1
+        OUTCOUNT = 1
+        OUTFLAG = 1
+        ATTACHK = 0 !INITIALIZE ATTACHK FLAG
+        IREF1 = 0 !INITILIAZE STAGNANT PARTICLE INDICATOR
+        IREF2 = 0 !INITILIAZE STAGNANT PARTICLE INDICATOR
+
+C       PROVIDE PARTICLE VELOCITIES FOR FIRST TRANSLATION STEP
+        UX = 0.0
+        UY = 0.0
+        UZ = 0.0
+C       INITIALIZE PARAMETERS OF HYDRODYNAMIC TORQUE 
+        WBARX=0.0
+        WBARY=0.0
+        WBARZ=0.0
+        TD1=0.0
+        TD2=0.0
+        TD3=0.0
+        TMULT1X=0.0
+        TMULT2X=0.0
+        TMULT1Y=0.0
+        TMULT2Y=0.0
+        TMULTZ= 0.0
+        Wzy=0.0
+        Wxz=0.0
+        Wyx=0.0
+        TDLVO = (/0.0,0.0,0.0/)
+        THX=0.0
+        THY=0.0
+        THZ=0.0
+C       INITIALIZE FORCE AND TRANSLATION VARIABLES   
+        FCOLL = 0.0
+        FEDL = 0.0
+        FVDW = 0.0
+        FDRGX = 0.0
+        FDRGY= 0.0
+        FDRGZ= 0.0
+        FDIFX= 0.0
+        FDIFY= 0.0
+        FDIFZ= 0.0
+        XDIF = 0.0
+        YDIF = 0.0
+        ZDIF = 0.0
+        LR=0.004*RSPHERE                    !      ROUGHNESS LAYER
+        VX= 0.0
+        VY= 0.0
+        VZ= 0.0
+        AFRACT= -1.0 
+        PTIME = 0.0
+        TBULK = 0.0
+        TNEAR = 0.0
+        TFRIC = 0.0
+
+        TRAJNEAR = 0.0
+        DISPNEAR = 0.0
+        SECCOUNT = 1
+        UT = 999
+C
+
+C       TRANSLATION LOOP
+        DO WHILE (ATTACHK.EQ.0)
+            IF (H.LE.5.0E-7) THEN
+                POUT=100
+                IF (H.LE.1.0E-7) THEN
+                POUT=10
+                    IF (H.LE.5.0E-8) THEN
+                    POUT =0
+                    ENDIF
+                END IF
+            ELSE
+                POUT=NOUT
+            END IF
+            IF ((PCOUNT.GE.POUT).OR.(I.EQ.1)) THEN  
+                PCOUNT = 0
+                Q0OT(OUTCOUNT)= Q0		
+                Q1OT(OUTCOUNT)= Q1		
+                Q2OT(OUTCOUNT)= Q2		
+                Q3OT(OUTCOUNT)= Q3
+                XOT(OUTCOUNT) = X
+                YOT(OUTCOUNT) = Y
+                ZOT(OUTCOUNT) = Z 
+                IOT(OUTCOUNT) = I
+                HOT(OUTCOUNT) = H
+                FCOLLOT(OUTCOUNT) = FCOLL                
+                PHIOT(OUTCOUNT)=PHI		                
+                THETAOT(OUTCOUNT)=THETA		
+                PSIOT(OUTCOUNT)=PSI
+                FEDLOT(OUTCOUNT) = FEDL
+                FVDWOT(OUTCOUNT) = FVDW
+                FDRGXOT(OUTCOUNT) = FDRGX
+                FDRGYOT(OUTCOUNT) = FDRGY
+                FDRGZOT(OUTCOUNT) = FDRGZ
+                WDIFXOT(OUTCOUNT) = WDIFX
+                WDIFYOT(OUTCOUNT) = WDIFY
+                WDIFZOT(OUTCOUNT) = WDIFZ
+                WBARXOT(OUTCOUNT) = WBARX
+                WBARYOT(OUTCOUNT) = WBARY
+                WBARZOT(OUTCOUNT) = WBARZ
+                XDIFOT(OUTCOUNT)=XDIF
+                YDIFOT(OUTCOUNT)=YDIF
+                ZDIFOT(OUTCOUNT)=ZDIF
+                THXOT(OUTCOUNT)=THX
+                THYOT(OUTCOUNT)=THY
+                THZOT(OUTCOUNT)=THZ
+                FLIFTXOT(OUTCOUNT)=FLIFTX
+                FLIFTYOT(OUTCOUNT)=FLIFTY
+                FLIFTZOT(OUTCOUNT)=FLIFTZ
+                UXOT(OUTCOUNT) = UX
+                UYOT(OUTCOUNT) = UY
+                UZOT(OUTCOUNT) = UZ
+                VXOT(OUTCOUNT) = VX
+                VYOT(OUTCOUNT) = VY
+                VZOT(OUTCOUNT) = VZ
+                PTIMEFOT(OUTCOUNT) = PTIMEF
+                AFRACTOT(OUTCOUNT) = AFRACT                  
+                OUTCOUNT = OUTCOUNT +1   
+C               RESET OUTPUT COUNTER TO KEEP STORING NEW VALUE IN THE BEGINNING OF THE ARRAY
+C               FLAG THIS EVENT TO OUTPUT ARRAY PROPERLY WHEN TRAJECTORY IS RESOLVED                     
+                IF (OUTCOUNT.GT.OUTMAX) THEN                                    
+                    OUTFLAG = OUTFLAG + 1
+C                   IF ARRAY REWRITE OCCURS OUTMAX TIMES, THEN OVERWRITE SECOND 
+C                   TO LAST POSITION TO HOLD SPACE FOR FINAL RESOLVED POSITION
+                    IF (OUTFLAG.EQ.OUTMAX) THEN
+                        OUTFLAG = OUTFLAG - 1
+                    END IF
+                    OUTCOUNT = OUTFLAG    
+                END IF   
+                IF (CLUSTER.EQ.0) THEN          
+                     PRINT 6001, J,I,X,Y,Z,H         
+ 6001                FORMAT ('J= ',I4,1X,'I= ',I9,1X,'X= ',E11.4,1X, 
+     &               'Y=',E11.4,1X,'Z= ',E11.4,1X,'H= ',E11.4,1X)
+                ENDIF               
+            END IF   !(PCOUNT.EQ.NOUT).OR.(I.EQ.1)
+C           CALCULATE ELAPSED TIME
+            ETIME = PTIMEF-PTIMEFOT(1)     
+            I = I + 1 !COUNT THE NUMBER OF TRANSLATIONS
+C           OUTPUT TO ARRAY   
+            PCOUNT = PCOUNT + 1 !COUNT THE NUMBER OF TRANSLATIONS TO OUT            
+C           RECORD PREVIOUS VALUES
+            XO = X
+            YO = Y
+            ZO = Z
+********************    KE    *****************************************    
+C          
+            IF (I.EQ.2) THEN
+		   X = XO+(UX*dT)
+		   Y = YO+(UY*dT)
+             Z = ZO+(UZ*dT)
+C           ANGULAR DISPLACEMENT              
+             Q0 = Q0O+ 0.5*dT*(-Q1O*WBARX-Q2O*WBARY-Q3O*WBARZ)
+             Q1 = Q1O+ 0.5*dT*(Q0O*WBARX-Q3O*WBARY+Q2O*WBARZ)
+             Q2 = Q2O+ 0.5*dT*(Q3O*WBARX+Q0O*WBARY-Q1O*WBARZ)
+             Q3 = Q3O+ 0.5*dT*(-Q2O*WBARX+Q1O*WBARY+Q0O*WBARZ)
+            ELSE 
+             X = XO + 1.5*DELTAXO-0.5*DELTAXO1+XDIF
+		   Y = YO + 1.5*DELTAYO-0.5*DELTAYO1+YDIF
+             Z = ZO + 1.5*DELTAZO-0.5*DELTAZO1+ZDIF
+            CALL GAUSS (dT,WBARX,WBARY,WBARZ,Q0O,Q1O,Q2O,Q3O,
+     &                 Q0,Q1,Q2,Q3)
+            QE=Q0*Q0+Q1*Q1+Q2*Q2+Q3*Q3-1.0
+                IF (ABS(QE).GE.1.0E-4) THEN
+                    ATTACHK=7
+                END IF      
+            ENDIF !(I.EQ.2)              
+C           CALCULATE RADIAL DISTANCE
+            R = ((X-Xm0)*(X-Xm0)+(Y-Ym0)*(Y-Ym0)+(Z-Zm0)*(Z-Zm0))**0.5
+            ENX = (X-Xm0)/R
+            ENY = (Y-Ym0)/R
+            ENZ = (Z-Zm0)/R
+C           UPDATE MATRIX A FOR EACH TRANSLATION
+            MATRIX_A(1,1)= 1.0-2.0*(Q2*Q2+Q3*Q3)
+            MATRIX_A(1,2)= 2.0*(Q1*Q2+Q3*Q0)
+            MATRIX_A(1,3)= 2.0*(Q1*Q3-Q2*Q0)
+            MATRIX_A(2,1)= 2.0*(Q2*Q1-Q3*Q0)
+            MATRIX_A(2,2)= 1.0-2.0*(Q3*Q3+Q1*Q1)
+            MATRIX_A(2,3)= 2.0*(Q2*Q3+Q1*Q0)
+            MATRIX_A(3,1)= 2.0*(Q3*Q1+Q2*Q0)
+            MATRIX_A(3,2)= 2.0*(Q3*Q2-Q1*Q0)
+            MATRIX_A(3,3)= 1.0-2.0*(Q1*Q1+Q2*Q2)
+C           DIFFUTION ROTATION MATRIX 
+            TD1(1,1)= 1.0
+            TD1(2,2:3)=(/ COS(WDIFX), SIN(WDIFX) /)
+            TD1(3,2:3)=(/ -SIN(WDIFX), COS(WDIFX) /)
+            TD2(1,1:3:2)= (/COS(WDIFY), -SIN(WDIFY) /)
+            TD2(2,2)=1.0
+            TD2(3,1:3:2)=(/ SIN(WDIFY),COS(WDIFY) /)
+            TD3(1,1:2)= (/ COS(WDIFZ), SIN(WDIFZ) /)
+            TD3(2,1:2)=(/ -SIN(WDIFZ), COS(WDIFZ) /)
+            TD3(3,3)=1.0 
+C           ROTATE MATRIX_A
+            CALL RDIFF (TD1,TD2,TD3,MATRIX_A)
+            TRANSPOSEA= TRANSPOSE(MATRIX_A)
+C           AVOID NAN CAUSED BY MATRIX_A(3,3) BEYOND RANGE
+            DO WHILE ((MATRIX_A(3,3).GT.1.0).OR.(MATRIX_A(3,3).LT.-1.0))
+                IF (MATRIX_A(3,3).GT.1.0) THEN
+                    MATRIX_A(3,3)=2.0-MATRIX_A(3,3)                 
+                ELSE IF (MATRIX_A(3,3).LT.-1.0) THEN
+                    MATRIX_A(3,3)=-2.0-MATRIX_A(3,3)   
+                END IF
+            END DO
+C           FIND EULER ANGLES ACCORDING TO NEW MATRIX  
+            PHI = ATAN2(MATRIX_A(3,1),-MATRIX_A(3,2))
+            THETA = ACOS(MATRIX_A(3,3))
+            PSI = ATAN2(MATRIX_A(1,3),MATRIX_A(2,3))
+C           RETURNING QUATERNISN ACCORDING TO Z-X-Z EULER CONVENTION ANGLES
+	      Q0C=COS((PHI+PSI)/2.0)*COS(THETA/2.0)
+	      IF (ABS(Q0-Q0C).LE.ABS(Q0+Q0C))THEN
+	      Q0 = COS((PHI+PSI)/2.0)*COS(THETA/2.0)
+            Q1 = COS((PHI-PSI)/2.0)*SIN(THETA/2.0)
+            Q2 = SIN((PHI-PSI)/2.0)*SIN(THETA/2.0)
+            Q3 = SIN((PHI+PSI)/2.0)*COS(THETA/2.0)
+	      ELSE
+	      Q0 = -COS((PHI+PSI)/2.0)*COS(THETA/2.0)
+            Q1 = -COS((PHI-PSI)/2.0)*SIN(THETA/2.0)
+            Q2 = -SIN((PHI-PSI)/2.0)*SIN(THETA/2.0)
+            Q3 = -SIN((PHI+PSI)/2.0)*COS(THETA/2.0)
+	      END IF 	 	                
+C           CALCULATE SEPERATION DISTANCE
+            IF (BETA1.EQ.1.0) THEN
+                H=R-AG-AP
+            ELSE
+C     NOMORLIZATION          
+                H1=((X*X+Y*Y+Z*Z)*AP*AP)**0.25  
+                XS=X/H1
+                YS=Y/H1
+                ZS=Z/H1
+                APS=AP/H1
+                AH0(1)=XS
+                AH0(2)=YS
+                AH0(3)=ZS
+                AH1=MATMUL(MATRIX_A,AH0)
+                AH2(1)=APS*APS*(AH1(1)*AH1(1)+AH1(2)*AH1(2))
+                AH2(2)=APS*APS*BETA1*BETA1*AH1(3)*AH1(3)
+                CALL SOLVEH (AH2(1),AH2(2),AH1,APS,BETA1,H2,YH1,HCHK)
+                H=H2*H1-AG
+                YH1=YH1*H1
+                IF (HCHK.EQ.0) THEN 
+                    ATTACHK = 7
+                END IF
+            END IF
+C           EVALUATE IF PARTICLE GET OUTSIDE OF FLUID ENVELOPE
+              DO WHILE ((R.gt.RB).AND.(Z.LT.0.0))
+              X = X
+              Y = Y
+              Z = Z + 1.0E-7 * dT
+              R = ((X-Xm0)**2+(Y-Ym0)**2+(Z-Zm0)**2)**0.5
+              END DO
+C                     
+************************    KE   END *****************************************            
+
+C           INCREMENT TRAJECTORY TIME
+            PTIMEF = PTIMEF+dT
+C           INCREMENT BULK OR NEAR SURFACE TRAJECTORY TIME, TRACK PARTICLE TO STUCK INDICATOR IF IN NEAR SURFACE DOMAIN
+            IF (H.GT.2.0E-7) THEN
+                TBULK = TBULK+dT
+                dT=MULT*dTMRT
+            !ADD MULT3 FOR BULK dT
+            ELSE   
+C           IF H LESS THAN 200 NM EVALUATE TRAJECTORY OUTCOME        
+                IF (H.GT.HFRIC) THEN !PARTICLES IN NEAR SURFACE 
+                    TNEAR = TNEAR+dT
+                    !set dT to SMALL time step (small multiplier)
+                    dT = MULT2*dTMRT                          
+                    IF (IREF1.EQ.0) THEN !IDENTIFY REFERENCE POINT AND TIME
+                        XREF1 = X 
+                        YREF1 = Y
+                        ZREF1 = Z
+                        TREF1 = 0.0
+                        IREF1 = 1
+                        DIND1 = 0.0
+                    ELSE
+                        IREF1 = IREF1+1
+                        TREF1 = TREF1+dT
+                        DIND1=DIND1+(XDIF*XDIF+YDIF*YDIF+ZDIF*ZDIF)**0.5
+                        IF (IREF1.GT.1000) THEN !COMPARE REFERENCE DISTANCE TO DIFFUSION ONLY DISPLACEMENT 
+                            DREF1 = ((X-XREF1)*(X-XREF1)+(Y-YREF1)*
+     &                      (Y-YREF1)+(Z-ZREF1)*(Z-ZREF1))**0.5
+                            IF (VN.GT.VT) THEN
+                                DCOEF = FUN1
+                            ELSE
+                                DCOEF = FUN4
+                            END IF
+                            DIND1 = DFACT1*(6.0*DCOEF*KB*T*TREF1/
+     &                             (6.0*PI*AP*beta1*VISC))**0.5 !SCALE DISPLACEMENT TO DIFFUSION (WITHOUT DIFFSCALE)
+                            IF (DREF1.LT.DFACT1*DIND1) THEN 
+                                ATTACHK = 5 !RETENTION WITHOUT CONTACT IN NEAR SURFACE
+                            ELSE
+                                IREF1 = 0
+                            END IF
+                        END IF
+                    END IF !IF IREF1.EQ.O
+                    IF ((H.LT.5.0E-8).AND.(FCOLL.LE.-1.0E-11)) THEN    !WHEN THE FORCE IS IN THE ORDER OF E-11, DECREASE TIME STEP TO AVOID RUN INTO SURFACE				
+                        dT = MULT3*dTMRT				
+                    END IF
+                ENDIF ! IF H.GT.HFRIC
+C               ATTACHMENT BY SEPARATION DISTANCE
+                IF (ATTMODE.EQ.0) THEN
+                    IF (H.LE.HFRIC) THEN
+                        ATTACHK = 2
+                    ENDIF
+                ENDIF
+C               ATTACHMENT BY TORQUE BALANCE
+                IF (H.LE.HFRIC) THEN
+                    dT = MULT3*dTMRT !set dT to small time step (small multiplier)
+                    TFRIC = TFRIC+dT
+                    IF ((ATTMODE.EQ.1).AND.(FCOLL.LE.0))          THEN !TORQUE BALANCE MODE FOR ATTACHMENT BELOW ROUGHNESS LAYER
+C                      CONTACT POINT
+                       PABAR=YH1 
+                       PA=MATMUL(TRANSPOSEA,PABAR)
+C                      JKR CALCULATING DEFORMATION DIAMETER
+                       HSF=(PABAR(1)*PABAR(1)/AP**4.0+PABAR(2)*PABAR(2)
+     &                     /AP**4.0+PABAR(3)*PABAR(3)/AP**4/BETA1**4)
+     &                     **(-0.5)
+                       CURV=(HSF**3.0)/2.0*((PABAR(1)*PABAR(1)+PABAR(2)*
+     &                      PABAR(2))/AP**6.0+2.0*(PABAR(2)*PABAR(2)+
+     &                      PABAR(3)*PABAR(3)/BETA1/BETA1)/AP**6.0)
+                       DA = (-0.63*4.0*FCOLL/CURV/KINT)**(CBRT)
+C                      DEFORMATION DEPTH                       
+                       DELTAH=1.0/CURV-(1.0/CURV/CURV-DA*DA/4.0)**0.5
+C                      Calculating torques and forces 
+                       LDRVNG=R-H-AG
+                       LADH=PA(1)+DA
+                       SA=2.0E-10                                     !SHIFTED CONTACT AREA (DOMINIK etc., 1995)
+C
+                       TADH=SA*ABS(FCOLL)-LADH*FGN                     
+                       TDRVNG=LDRVNG*(FDRGT+FGT)                        
+                       IF (TDRVNG.LE.TADH) THEN 
+                          ATTACHK = 2 !PARTICLE ARRESTS
+                       ENDIF
+                    ENDIF ! FOR ATTMODHE.EQ.1.AND.
+                    IF (H.LT.5.0E-10) THEN		
+                      ATTACHK = 6 !Flag if particle runs into surface		
+                    END IF
+                ENDIF ! FOR H.LT.HFRIC           
+            ENDIF !FOR H.LT.2.0E-7
+
+C           EXIT CONDITION IF PARTICLE IS IN BULK FLUID           
+            IF ((R.GT.RB).AND.(Z.GT.0.0)) THEN
+                ATTACHK = 1
+            ENDIF
+
+C           FINISH TRAJECTORY IF PARTICLE STILL IN THE SYSTEM BEFORE TOTAL TIME IS REACHED (NO STAGNANT)
+            IF (PTIMEF.GT.TTIME) THEN
+                ATTACHK = 3
+            ENDIF
+C
+C           SKIP FORCE AND INTEGRATION IF PARTICLE RESOLVES
+            IF (ATTACHK.EQ.0) THEN                                                  ***********this attach.eq.0 not needed
+C               DETERMINE UNIT VECTORS
+                ENX = (X-Xm0)/R
+                ENY = (Y-Ym0)/R
+                ENZ = (Z-Zm0)/R
+
+C               DETERMINE FORCES
+C               CALCULATE GRAVITATIONAL FORCE  
+                CALL GRAVITY(GRAVFACT,AP,BETA1,G,RHOP,RHOW,PI,FG)                   **********KE
+C
+C               CALCULATE COLLOIDAL FORCE 
+C               USED SPHERE-SPHERE GEOMETRY (VIOLATES LINEAR APROXIMATION APPROACH, 
+C               REASONABLE FOR LARGE COLLECTOR RADII) 
+C               CALCULATE EDL 
+
+C	          IF BULK ZETAC AND ZETAP1 ARE OPPOSITE IN SIGN, THEN SET SCOV = 0
+                    ZETAC = ZETACST
+                     IF (H.LE.0.5E-6) THEN
+                        
+                        CALL FORCEDLVO (KAPPA,H,PI,FEDL,FVDW,
+     & KB,ERE0,ECHG,ZETAC,ZETAP1,ZETAP2,AP,BETA1,A132,
+     & MATRIX_A,ENX,ENY,ENZ,X,Y,Z,TDLVO,DELTASEI,PCOV,AG,PATCH)
+                    ELSE
+                        FEDL = 0.0                     ! HUILIAN ON 11/23/2015 FOR TESTING PURPOSE
+                        FVDW =A132*RSPHERE/6.0*(1.0/H*H+1.0/(H+2.0*
+     &                  RSPHERE)/(H+2.0*RSPHERE)-2.0/H/(H+2.0*RSPHERE))
+                        TDLVO = (/0.0,0.0,0.0/)
+                    END IF                     
+C
+C               CALCULATE BORN AND/OR STERIC REPULSION
+                CALL FORCESTE (PI,WO,LO,AP,AG,H,FSTE)
+                CALL FORCEBORN (A132,SIGMAC,AP,H,FBORN)
+                FCOLL = FEDL+FVDW+FSTE+FBORN
+C               CALCULATE DRAG FORCE             
+C               CALCULATE FLUID VELOCITY AT GIVEN LOCATION BEFORE CALCULATING DRAG FORCE
+                IF (R.LE.RB) THEN
+                    CALL HAPPELFF (X,Y,Z,K1,K2,K3,K4,VxH1,VyH1,VzH1,AG)
+                    VX = VxH1*VSUP
+                    VY = VyH1*VSUP
+                    VZ = VzH1*VSUP
+                ELSE
+                    VX = 0.0
+                    VY = 0.0
+                    VZ = VSUP                   
+                ENDIF
+                IF (I.EQ.2) THEN
+                    UX=VX
+                    UY=VY
+                    UZ=VZ
+                END IF    
+C
+	          VN = VX*ENX+VY*ENY+VZ*ENZ
+	          VNX = VN*ENX
+	          VNY = VN*ENY
+                VNZ = VN*ENZ
+	          VTX = VX-VNX
+                VTY = VY-VNY
+	          VTZ = VZ-VNZ
+                VT = (VTX*VTX+VTY*VTY+VTZ*VTZ)**0.5
+C           DEFINE TANGENTIAL FLUID VELOCITY UNIT VECTORS FOR CARTESIAN COMPONENTS DETERMINED BELOW
+                IF (VT.EQ.0) THEN
+                    ETX = 0.0
+                    ETY = 0.0
+                    ETZ = 0.0                
+                ELSE
+                    ETX = VTX/VT
+                    ETY = VTY/VT
+                    ETZ = VTZ/VT
+                ENDIF
+C   	      UNIVERSAL HYDRODYNAMIC FUNCTIONS
+	          HBAR = H/RSF
+	          FUN1=1.0+A1*EXP(B1*HBAR)+C1*EXP(D1*HBAR**E1)
+	          FUN2=1.0+A2*EXP(B2*HBAR)+C2*EXP(D2*HBAR**E2)
+	          FUN3=1.0+A3*EXP(B3*HBAR)+C3*EXP(D3*HBAR**E3)
+	          FUN4=1.0+A4*EXP(B4*HBAR)+C4*EXP(D4*HBAR**E4)
+C           NORMAL AND TANGENTIAL DRAG FORCES ARE CALCULATED WITH CORRECTED FUN2 AND FUN3 IN THE SUBROUTINE
+                CALL FORCEDRAG (FUN2,FUN3,FUN4,M3,FDRGX,FDRGY,FDRGZ,VX
+     &               ,VY,VZ,UX,UY,UZ,BETA1,Q0,Q1,Q2,Q3,AP,VISC,MATRIX_A
+     &               ,FRDRGX,FRDRGY,FRDRGZ,KBAR,KDBLBAR)                  
+C           CALCULATE LIFT FORCE
+                CALL FORCELIFT (VISC,RHOW,H,AP,VTX,VTY,VTZ,R,FLIFT,VX,VY
+     &,VZ,UX,UY,UZ,PI,KDBLBAR)
+                CALL TORQUEDRAG (X,Y,Z,PI,AP,BETA1,VISC,VSUP,MATRIX_A,
+     &               ALPHA0,BETA0,GAMMA0,Wzy,Wxz,Wyx,TMULT1X,TMULT2X,
+     &               TMULT1Y,TMULT2Y,TMULTZ,K1,K2,K3,K4,AG)
+                CALL BROWNIAN (dT,KB,T,KBAR,AP,BETA1,VISC,PI,XDIF
+     &               ,YDIF,ZDIF,WDIFX,WDIFY,WDIFZ,DIFFSCALE,MATRIX_A)
+
+C
+                IF ((H.LE.5.0E-8).AND.(ZETACST*ZETAP2.GT.0.0)) THEN
+                    XDIFO=0.0
+                    YDIFO=0.0
+                    ZDIFO=0.0
+                    WDIFXO=0.0
+                    WDIFYO=0.0
+                    WDIFZO=0.0
+                    DO 1990 K=1,10 
+                      CALL BROWNIAN (dT,KB,T,KBAR,AP,BETA1,VISC,PI,XDIF
+     &                 ,YDIF,ZDIF,WDIFX,WDIFY,WDIFZ,DIFFSCALE,MATRIX_A) 
+                    XDIFO=XDIFO+XDIF
+                    YDIFO=YDIFO+YDIF
+                    ZDIFO=ZDIFO+ZDIF
+                    WDIFXO=WDIFXO+WDIFX
+                    WDIFYO=WDIFYO+WDIFY
+                    WDIFZO=WDIFZO+WDIFZ                    
+1990                CONTINUE    
+                    XDIF=XDIFO/10.0
+                    YDIF=YDIFO/10.0
+                    ZDIF=ZDIFO/10.0
+                    WDIFX=WDIFXO/10.0
+                    WDIFY=WDIFYO/10.0
+                    WDIFZ=WDIFZO/10.0                   
+                END IF   
+C           BREAK FORCES INTO CARTESIAN COMPONENTS
+C           WHEN EXAMINING NORMAL AND TANGENTIAL: POSITIVE NORMAL IS AWAY FROM THE SURFACE, 
+C           NEGATIVE NORMAL IS TOWARDS THE SURFACE
+C           GRAVITATIONAL 
+C                
+	          FGN=FG*ENZ
+	          FGNx=FGN*ENX
+	          FGNy=FGN*ENY
+	          FGNz=FGN*ENZ
+	          FGTx=0.0-FGNx
+	          FGTy=0.0-FGNy
+	          FGTz=FG-FGNz
+                FGT=(FGTx*FGTx+FGTy*FGTy+FGTz*FGTz)**0.5
+C           COLLOIDAL
+	          FCOLLX=FCOLL*ENX
+	          FCOLLY=FCOLL*ENY
+	          FCOLLZ=FCOLL*ENZ      
+C           DRIVING DRAG FORCE
+                FDRGN=FDRGX*ENX+FDRGY*ENY+FDRGZ*ENZ              !DRAGFOECE CORRECTION
+	          FDRGNX=FDRGN*ENX
+	          FDRGNY=FDRGN*ENY
+	          FDRGNZ=FDRGN*ENZ  
+                FDRGTX = FUN3/FUN4*(FDRGX - FDRGNX)      
+                FDRGTY = FUN3/FUN4*(FDRGY - FDRGNY)  
+                FDRGTZ = FUN3/FUN4*(FDRGZ - FDRGNZ)
+                FDRGN =FUN2*FDRGN
+                FDRGNX=FDRGN*ENX
+	          FDRGNY=FDRGN*ENY
+	          FDRGNZ=FDRGN*ENZ
+                FDRGT=(FDRGTX*FDRGTX+FDRGTY*FDRGTY+FDRGTZ*FDRGTZ)**0.5
+C           RESISTING DRAG FORCE TESTING, NOT USED BECAUSE NOT COMPATIBLE WITH A HYBRID INTEGRATION METHOD, KE LI                
+                FRDRGN=FRDRGX*ENX+FRDRGY*ENY+FRDRGZ*ENZ           
+	          FRDRGNX=FRDRGN*ENX
+	          FRDRGNY=FRDRGN*ENY
+	          FRDRGNZ=FRDRGN*ENZ  
+                FRDRGTX = (FRDRGX-FRDRGNX)/FUN4     
+                FRDRGTY = (FRDRGY-FRDRGNY)/FUN4 
+                FRDRGTZ = (FRDRGZ-FRDRGNZ)/FUN4
+                FRDRGN=FUN1*FRDRGN
+                FRDRGNX=FRDRGN*ENX
+	          FRDRGNY=FRDRGN*ENY
+	          FRDRGNZ=FRDRGN*ENZ
+C           LIFT 
+                FLIFT = 0.0                     ! CURRENTLY SET TO ZERO, LATER WITH CONSIDER EUQATION FOR ROD SHAPE PARTICLES
+                FLIFTX=FLIFT(1)
+	          FLIFTY=FLIFT(2)
+	          FLIFTZ=FLIFT(3)                
+C
+C           SAVE VELOCITIES FROM PREVIOUS TIME STEP
+                IF (I.EQ.2) THEN  !NEED TO APPLY AT  I=2 SINCE FIRST TRANSLATION IS ALREADY DONE
+                    UN = UX*ENX+UY*ENY+UZ*ENZ
+                    UNX = VNX
+                    UNY = VNY
+                    UNZ = VNZ
+                    UTX = VTX 
+                    UTY = VTY 
+                    UTZ = VTZ
+                    UNXO = VNX
+                    UNYO = VNY
+                    UNZO = VNZ
+                    UTXO = VTX
+                    UTYO = VTY
+                    UTZO = VTZ
+                 END IF
+	          UXO = UNX + UTX
+	          UYO = UNY + UTY
+	          UZO = UNZ + UTZ
+                UN = UXO*ENX+UYO*ENY+UZO*ENZ
+                UNXO = UN*ENX
+                UNYO = UN*ENY
+                UNZO = UN*ENZ
+                UTXO = UXO-UNXO
+                UTYO = UYO-UNYO
+                UTZO = UZO-UNZO
+************************************************** KE ****************************************                  
+C        In order to use adam integration scheme, previous two time step is recorded, 
+C         and h*u as 'deltauxo' in Xn+2= Xn+1+1.5*h*u(t=n+1)-0.5*h*u(t=n) is recorded.
+                UZO1 = UZO
+                UXO1 = UXO
+                UYO1 = UYO
+                UZO = UZ
+                UXO = UX
+                UYO = UY
+                DELTAXO=dT*UX
+                DELTAYO=dT*UY
+                DELTAZO=dT*UZ                		
+                DELTAXO1=dT*UXO		
+                DELTAYO1=dT*UYO
+                DELTAZO1=dT*UZO
+C       ANGULAR VELOCITY AND ANGULAR DISPLACEMENT          		                DELTAZO=dT*UZO
+                WBARXO=WBARX
+                WBARYO=WBARY
+                WBARZO=WBARZ
+                Q0O1 = Q0O
+                Q1O1 = Q1O
+                Q2O1 = Q2O
+                Q3O1 = Q3O		
+                Q0O = Q0		
+                Q1O = Q1		
+                Q2O = Q2		
+                Q3O = Q3                                 
+************************************************** KE END****************************************                
+C                
+******************************** EXPLICIT METHOD, KE USING COMBINED IMPLICIT METHOD TO TRANSLATE PARTICLE*************************
+          B(1)=FGNX+FCOLLX+FLIFTX+FDRGNX+UNXO*(MP+VM)/dT
+          B(2)=FGNY+FCOLLY+FLIFTY+FDRGNY+UNYO*(MP+VM)/dT
+          B(3)=FGNZ+FCOLLZ+FLIFTZ+FDRGNZ+UNZO*(MP+VM)/dT
+          A(1,1)=(MP+VM)/dT+M3/FUN1*(KDBLBAR(1,1)*ENX*ENX+KDBLBAR(2,1)
+     &    *ENX*ENY+KDBLBAR(3,1)*ENX*ENZ)
+          A(1,2)=M3/FUN1*(KDBLBAR(1,2)*ENX*ENX+KDBLBAR(2,2)*ENX*ENY
+     &    +KDBLBAR(3,2)*ENX*ENZ)
+          A(1,3)=M3/FUN1*(KDBLBAR(1,3)*ENX*ENX+KDBLBAR(2,3)*ENX*ENY
+     &    +KDBLBAR(3,3)*ENX*ENZ)
+          A(2,1)=M3/FUN1*(KDBLBAR(1,1)*ENX*ENY+KDBLBAR(2,1)*ENY*ENY
+     &    +KDBLBAR(3,1)*ENY*ENZ)
+          A(2,2)=(MP+VM)/dT+M3/FUN1*(KDBLBAR(1,2)*ENX*ENY+KDBLBAR(2,2)
+     &    *ENY*ENY+ KDBLBAR(3,2)*ENY*ENZ)
+          A(2,3)=M3/FUN1*(KDBLBAR(1,3)*ENX*ENY+KDBLBAR(2,3)*ENY*ENY
+     &    +KDBLBAR(3,3)*ENY*ENZ)
+          A(3,1)=M3/FUN1*(KDBLBAR(1,1)*ENX*ENZ+KDBLBAR(2,1)*ENY*ENZ
+     &    +KDBLBAR(3,1)*ENZ*ENZ)
+          A(3,2)=M3/FUN1*(KDBLBAR(1,2)*ENX*ENZ+KDBLBAR(2,2)*ENY*ENZ
+     &    +KDBLBAR(3,2)*ENZ*ENZ)
+          A(3,3)=(MP+VM)/dT+M3/FUN1*(KDBLBAR(1,3)*ENX*ENZ+KDBLBAR(2,3)
+     &    *ENY*ENZ+KDBLBAR(3,3)*ENZ*ENZ)
+C         
+          A=A*1.0E10
+          B=B*1.0E10
+          Call GAUSSU (A,B,FLAG)
+          UNX=B(1)
+          UNY=B(2)
+          UNZ=B(3)
+     
+          B(1)=FGTX+FDRGTX+UTXO*(MP+VM)/dT
+          B(2)=FGTY+FDRGTY+UTYO*(MP+VM)/dT
+          B(3)=FGTZ+FDRGTZ+UTZO*(MP+VM)/dT
+          A(1,1)=(MP+VM)/dT+M3/FUN4*(KDBLBAR(1,1)*(1-ENX*ENX)-
+     &    KDBLBAR(2,1)*ENX*ENY-KDBLBAR(3,1)*ENX*ENZ)
+          A(1,2)=M3/FUN4*(KDBLBAR(1,2)*(1-ENX*ENX)-KDBLBAR(2,2)*ENX*ENY
+     &    -KDBLBAR(3,2)*ENX*ENZ)
+          A(1,3)=M3/FUN4*(KDBLBAR(1,3)*(1-ENX*ENX)-KDBLBAR(2,3)*ENX*ENY
+     &    -KDBLBAR(3,3)*ENX*ENZ)
+          A(2,1)=M3/FUN4*(-KDBLBAR(1,1)*ENX*ENY+KDBLBAR(2,1)*(1-ENY*ENY)
+     &    -KDBLBAR(3,1)*ENY*ENZ)
+          A(2,2)=(MP+VM)/dT+M3/FUN4*(-KDBLBAR(1,2)*ENX*ENY+KDBLBAR(2,2)
+     &    *(1-ENY*ENY)-KDBLBAR(3,2)*ENY*ENZ)
+          A(2,3)=M3/FUN4*(-KDBLBAR(1,3)*ENX*ENY+KDBLBAR(2,3)*(1-ENY*ENY)
+     &    -KDBLBAR(3,3)*ENY*ENZ)
+          A(3,1)=M3/FUN4*(-KDBLBAR(1,1)*ENX*ENZ-KDBLBAR(2,1)*ENY*ENZ
+     &    +KDBLBAR(3,1)*(1-ENZ*ENZ))
+          A(3,2)=M3/FUN4*(-KDBLBAR(1,2)*ENX*ENZ-KDBLBAR(2,2)*ENY*ENZ
+     &    +KDBLBAR(3,2)*(1-ENZ*ENZ))
+          A(3,3)=(MP+VM)/dT+M3/FUN4*(-KDBLBAR(1,3)*ENX*ENZ-KDBLBAR(2,3)
+     &    *ENY*ENZ+KDBLBAR(3,3)*(1-ENZ*ENZ)) 
+C          
+          A=A*1.0E10
+          B=B*1.0E10
+          Call GAUSSU (A,B,FLAG)
+          UTX=B(1)
+          UTY=B(2)
+          UTZ=B(3)
+******************************** KE USING COMBINED IMPLICIT METHOD TO TRANSLATE PARTICLE END*************************
+******************************** KE INCREMENTING ANGULAR VELOCITY*************************     
+C    INCREMENT ANGULAR VELOCITY          
+           WBARX=(IX/dT*WBARXO+WBARYO*WBARZO*(IY-IZ)+
+     &            TMULT2X*Wzy+TMULT1X+TDLVO(1))/(IX/dT+TMULT2X)
+           WBARY=(IY/dT*WBARYO+WBARZO*WBARXO*(IZ-IX)+
+     &            TMULT2Y*Wxz+TMULT1Y+TDLVO(2))/(IY/dT+TMULT2Y)
+           WBARZ=(IZ/dT*WBARZO+WBARXO*WBARYO*(IX-IY)+
+     &            TMULTZ*Wyx+TDLVO(3))/(IZ/dT+TMULTZ)
+           THX=Tmult1x+Tmult2x*(Wzy-WBARX)                        
+           THY=Tmult1y+Tmult2y*(Wxz-WBARY)
+           THZ=Tmultz*(Wyx-WBARZ)
+C                         
+           IF (WBARX.GT.1.0E4) THEN
+		    WBARX=1.0E4
+           END IF
+	     IF (WBARY.GT.1.0E4) THEN
+		    WBARY=1.0E4
+           END IF
+	     IF (WBARZ.GT.1.0E4) THEN
+		    WBARZ=1.0E4
+           END IF
+	     IF (WBARX.LT.-1.0E4) THEN
+		    WBARX=-1.0E4
+           END IF
+	     IF (WBARY.LT.-1.0E4) THEN
+		    WBARY=-1.0E4
+           END IF
+	     IF (WBARZ.LT.-1.0E4) THEN
+		    WBARZ=-1.0E4
+           END IF
+C      
+******************************** KE INCREMENTING ANGULAR VELOCITY END************************* 
+******************************** KE USING OLD UO VALUE TO TRANSLATE PARTICLE END************************* 
+C               RECOMPOSE CARTESIAN VELOCITIES
+	          UX=UNX+UTX
+	          UY=UNY+UTY
+	          UZ=UNZ+UTZ
+            ELSE !ATTACHK.GT.0
+C               STORE FINAL TRAJECTORY VALUES   
+                XOT(OUTCOUNT) = X
+                YOT(OUTCOUNT) = Y
+                ZOT(OUTCOUNT) = Z 
+                IOT(OUTCOUNT) = I
+                Q0OT(OUTCOUNT)= Q0		
+                Q1OT(OUTCOUNT)= Q1		
+                Q2OT(OUTCOUNT)= Q2		
+                Q3OT(OUTCOUNT)= Q3		
+                PHIOT(OUTCOUNT)=PHI		
+                THETAOT(OUTCOUNT)=THETA		
+                PSIOT(OUTCOUNT)=PSI
+                HOT(OUTCOUNT) = H
+                FCOLLOT(OUTCOUNT) = FCOLL
+                FEDLOT(OUTCOUNT) = FEDL
+                FVDWOT(OUTCOUNT) = FVDW
+                FDRGXOT(OUTCOUNT) = FDRGX
+                FDRGYOT(OUTCOUNT) = FDRGY
+                FDRGZOT(OUTCOUNT) = FDRGZ
+                WDIFXOT(OUTCOUNT) = WDIFX
+                WDIFYOT(OUTCOUNT) = WDIFY		
+                WDIFZOT(OUTCOUNT) = WDIFZ		
+                WBARXOT(OUTCOUNT) = WBARX		
+                WBARYOT(OUTCOUNT) = WBARY		
+                WBARZOT(OUTCOUNT) = WBARZ		
+                XDIFOT(OUTCOUNT)=XDIF		
+                YDIFOT(OUTCOUNT)=YDIF		
+                ZDIFOT(OUTCOUNT)=ZDIF		
+                THXOT(OUTCOUNT)=THX		
+                THYOT(OUTCOUNT)=THY		
+                THZOT(OUTCOUNT)=THZ
+                FLIFTXOT(OUTCOUNT)=FLIFTX
+                FLIFTYOT(OUTCOUNT)=FLIFTY
+                FLIFTZOT(OUTCOUNT)=FLIFTZ
+C
+                UXOT(OUTCOUNT) = UX
+                UYOT(OUTCOUNT) = UY
+                UZOT(OUTCOUNT) = UZ
+                VXOT(OUTCOUNT) = VX
+                VYOT(OUTCOUNT) = VY
+                VZOT(OUTCOUNT) = VZ
+                PTIMEFOT(OUTCOUNT) = PTIMEF
+                AFRACTOT(OUTCOUNT) = AFRACT           
+            END IF !IF ATTACHK.EQ.0
+C
+        END DO !TRAJECTORY LOOP (ATTACHK=0)
+C       WRITE ARRAY TO FILE 
+
+        WRITE (11,105) ATTACHK
+        WRITE (11,106)
+        WRITE (12,105) ATTACHK
+        WRITE (12,106)
+        WRITE (13,105) ATTACHK
+        WRITE (13,106)
+     
+C       WRITE DATA TO FLUX AND TRAJECTORY FILES
+        NPRINT = INT(OUTCOUNT/PRINTMAX)+1
+        IF (ATTACHK.EQ.1)THEN !EXIT TRAJECTORY FILE TO CLUSTER
+            DO K=1,OUTFLAG-1
+                WRITE (11,107)XOT(K),YOT(K),ZOT(K),IOT(K),HOT(K),
+     &          Q0OT(K),Q1OT(K), Q2OT(K),Q3OT(K),
+     &          PHIOT(K),THETAOT(K),PSIOT(K),          
+     &          FCOLLOT(K),FEDLOT(K),FVDWOT(K),
+     &          FDRGXOT(K),FDRGYOT(K),FDRGZOT(K),
+     &          WDIFXOT(K),WDIFYOT(K),WDIFZOT(K),
+     &          WBARXOT(K),WBARYOT(K),WBARZOT(K),
+     &          XDIFOT(K),YDIFOT(K),ZDIFOT(K),
+     &          THXOT(K),THYOT(K),THZOT(K),
+     &          FLIFTXOT(K),FLIFTYOT(K),FLIFTZOT(K),                
+     &          UXOT(K),UYOT(K),UZOT(K),
+     &          VXOT(K),VYOT(K),VZOT(K),
+     &          PTIMEFOT(K),AFRACTOT(K)
+            END DO
+            DO K=OUTFLAG,OUTCOUNT-2,NPRINT
+            WRITE (11,107)XOT(K),YOT(K),ZOT(K),IOT(K),HOT(K),
+     &      Q0OT(K),Q1OT(K), Q2OT(K), Q3OT(K),  
+     &      PHIOT(K),THETAOT(K),PSIOT(K),        
+     &      FCOLLOT(K),FEDLOT(K),FVDWOT(K),
+     &      FDRGXOT(K),FDRGYOT(K),FDRGZOT(K),
+     &      WDIFXOT(K),WDIFYOT(K),WDIFZOT(K),
+     &      WBARXOT(K),WBARYOT(K),WBARZOT(K),
+     &      XDIFOT(K),YDIFOT(K),ZDIFOT(K),
+     &      THXOT(K),THYOT(K),THZOT(K),
+     &      FLIFTXOT(K),FLIFTYOT(K),FLIFTZOT(K),       
+     &      UXOT(K),UYOT(K),UZOT(K),
+     &      VXOT(K),VYOT(K),VZOT(K), 
+     &      PTIMEFOT(K),AFRACTOT(K)
+            END DO
+            DO K = OUTCOUNT-1-MOD(OUTCOUNT-2-OUTFLAG,NPRINT),OUTCOUNT
+            WRITE (11,107)XOT(K),YOT(K),ZOT(K),IOT(K),HOT(K),
+     &      Q0OT(K),Q1OT(K), Q2OT(K), Q3OT(K),              
+     &      PHIOT(K),THETAOT(K),PSIOT(K),        
+     &      FCOLLOT(K),FEDLOT(K),FVDWOT(K),
+     &      FDRGXOT(K),FDRGYOT(K),FDRGZOT(K),
+     &      WDIFXOT(K),WDIFYOT(K),WDIFZOT(K),
+     &      WBARXOT(K),WBARYOT(K),WBARZOT(K),
+     &      XDIFOT(K),YDIFOT(K),ZDIFOT(K),
+     &      THXOT(K),THYOT(K),THZOT(K),
+     &      FLIFTXOT(K),FLIFTYOT(K),FLIFTZOT(K),       
+     &      UXOT(K),UYOT(K),UZOT(K),
+     &      VXOT(K),VYOT(K),VZOT(K), 
+     &      PTIMEFOT(K),AFRACTOT(K)
+            END DO
+C
+            K = OUTCOUNT ! OUTPUT LAST ARRAY VALUE
+C           WRITE TO FLUX FILE
+            WRITE (21,207)ipart,HOT(1),XOT(1),YOT(1),ZOT(1),
+     &            Q0OT(1), Q1OT(1),Q2OT(1),Q3OT(1), 
+     &            RINJ,HOT(K),XOT(K),YOT(K),ZOT(K),
+     &            Q0OT(K), Q1OT(K),Q2OT(K),Q3OT(K),
+     &            PTIMEFOT(1),PTIMEFOT(K),
+     &            ETIME,TBULK,TNEAR,TFRIC,TRAJNEAR,
+     &            DISPNEAR,SECCOUNT,ATTACHK,AFRACT
+C           WRITE TO FLUX FILE
+            IF (CLUSTER.EQ.0) THEN
+                  WRITE (31,207)ipart,HOT(1),XOT(1),YOT(1),ZOT(1),
+     &            Q0OT(1), Q1OT(1),Q2OT(1),Q3OT(1), 
+     &            RINJ,HOT(K),XOT(K),YOT(K),ZOT(K),
+     &            Q0OT(K), Q1OT(K),Q2OT(K),Q3OT(K),
+     &            PTIMEFOT(1),PTIMEFOT(K),
+     &            ETIME,TBULK,TNEAR,TFRIC,TRAJNEAR,
+     &            DISPNEAR,SECCOUNT,ATTACHK,AFRACT
+            END IF
+        END IF
+C
+        IF ((ATTACHK.EQ.2).OR.(ATTACHK.EQ.4).OR.(ATTACHK.EQ.6)) THEN !ATTACHED PARTICLE   
+            DO K=1,OUTFLAG-1
+                WRITE (12,107)XOT(K),YOT(K),ZOT(K),IOT(K),HOT(K),
+     &          Q0OT(K),Q1OT(K),Q2OT(K),Q3OT(K),                 
+     &          PHIOT(K),THETAOT(K),PSIOT(K),          
+     &          FCOLLOT(K),FEDLOT(K),FVDWOT(K),
+     &          FDRGXOT(K),FDRGYOT(K),FDRGZOT(K),
+     &          WDIFXOT(K),WDIFYOT(K),WDIFZOT(K),
+     &          WBARXOT(K),WBARYOT(K),WBARZOT(K),                
+     &          XDIFOT(K),YDIFOT(K),ZDIFOT(K),
+     &          THXOT(K),THYOT(K),THZOT(K),
+     &          FLIFTXOT(K),FLIFTYOT(K),FLIFTZOT(K),           
+     &          UXOT(K),UYOT(K),UZOT(K),
+     &          VXOT(K),VYOT(K),VZOT(K),
+     &          PTIMEFOT(K),AFRACTOT(K)
+            END DO
+            DO K=OUTFLAG,OUTCOUNT-2,NPRINT
+            WRITE (12,107)XOT(K),YOT(K),ZOT(K),IOT(K),HOT(K),
+     &      Q0OT(K),Q1OT(K),Q2OT(K),Q3OT(K),             
+     &      PHIOT(K),THETAOT(K),PSIOT(K),        
+     &      FCOLLOT(K),FEDLOT(K),FVDWOT(K),
+     &      FDRGXOT(K),FDRGYOT(K),FDRGZOT(K),
+     &      WDIFXOT(K),WDIFYOT(K),WDIFZOT(K),
+     &      WBARXOT(K),WBARYOT(K),WBARZOT(K),            
+     &      XDIFOT(K),YDIFOT(K),ZDIFOT(K),
+     &      THXOT(K),THYOT(K),THZOT(K),
+     &      FLIFTXOT(K),FLIFTYOT(K),FLIFTZOT(K),       
+     &      UXOT(K),UYOT(K),UZOT(K),
+     &      VXOT(K),VYOT(K),VZOT(K), 
+     &      PTIMEFOT(K),AFRACTOT(K)
+            END DO
+            DO K=OUTCOUNT-1-MOD(OUTCOUNT-2-OUTFLAG,NPRINT),OUTCOUNT
+            WRITE (12,107)XOT(K),YOT(K),ZOT(K),IOT(K),HOT(K),
+     &      Q0OT(K),Q1OT(K),Q2OT(K),Q3OT(K),             
+     &      PHIOT(K),THETAOT(K),PSIOT(K),        
+     &      FCOLLOT(K),FEDLOT(K),FVDWOT(K),
+     &      FDRGXOT(K),FDRGYOT(K),FDRGZOT(K),
+     &      WDIFXOT(K),WDIFYOT(K),WDIFZOT(K),
+     &      WBARXOT(K),WBARYOT(K),WBARZOT(K),            
+     &      XDIFOT(K),YDIFOT(K),ZDIFOT(K),
+     &      THXOT(K),THYOT(K),THZOT(K),
+     &      FLIFTXOT(K),FLIFTYOT(K),FLIFTZOT(K),       
+     &      UXOT(K),UYOT(K),UZOT(K),
+     &      VXOT(K),VYOT(K),VZOT(K), 
+     &      PTIMEFOT(K),AFRACTOT(K)
+      END DO
+C                          
+C           WRITE TO FLUX FILE
+            K = OUTCOUNT ! OUTPUT LAST ARRAY VALUE
+            WRITE (22,207)ipart,HOT(1),XOT(1),YOT(1),ZOT(1),
+     &            Q0OT(1), Q1OT(1),Q2OT(1),Q3OT(1), 
+     &            RINJ,HOT(K),XOT(K),YOT(K),ZOT(K),
+     &            Q0OT(K), Q1OT(K),Q2OT(K),Q3OT(K),
+     &            PTIMEFOT(1),PTIMEFOT(K),
+     &            ETIME,TBULK,TNEAR,TFRIC,TRAJNEAR,
+     &            DISPNEAR,SECCOUNT,ATTACHK,AFRACT
+
+C           WRITE TO FLUX FILE
+            IF (CLUSTER.EQ.0) THEN
+                  WRITE (32,207)ipart,HOT(1),XOT(1),YOT(1),ZOT(1),
+     &            Q0OT(1), Q1OT(1),Q2OT(1),Q3OT(1), 
+     &            RINJ,HOT(K),XOT(K),YOT(K),ZOT(K),
+     &            Q0OT(K), Q1OT(K),Q2OT(K),Q3OT(K),
+     &            PTIMEFOT(1),PTIMEFOT(K),
+     &            ETIME,TBULK,TNEAR,TFRIC,TRAJNEAR,
+     &            DISPNEAR,SECCOUNT,ATTACHK,AFRACT
+            END IF
+        END IF
+C
+        IF ((ATTACHK.EQ.3).OR.(ATTACHK.EQ.5).OR.(ATTACHK.EQ.7)) THEN !REMAINING PARTICLE
+            DO K=1,OUTFLAG-1
+                WRITE (13,107)XOT(K),YOT(K),ZOT(K),IOT(K),HOT(K),
+     &          Q0OT(K),Q1OT(K), Q2OT(K),Q3OT(K),                  
+     &          PHIOT(K),THETAOT(K),PSIOT(K),          
+     &          FCOLLOT(K),FEDLOT(K),FVDWOT(K),
+     &          FDRGXOT(K),FDRGYOT(K),FDRGZOT(K),
+     &          WDIFXOT(K),WDIFYOT(K),WDIFZOT(K),
+     &          WBARXOT(K),WBARYOT(K),WBARZOT(K),                
+     &          XDIFOT(K),YDIFOT(K),ZDIFOT(K),
+     &          THXOT(K),THYOT(K),THZOT(K),
+     &          FLIFTXOT(K),FLIFTYOT(K),FLIFTZOT(K),           
+     &          UXOT(K),UYOT(K),UZOT(K),
+     &          VXOT(K),VYOT(K),VZOT(K),
+     &          PTIMEFOT(K),AFRACTOT(K)
+            END DO
+            DO K=OUTFLAG,OUTCOUNT-2,NPRINT
+            WRITE (13,107)XOT(K),YOT(K),ZOT(K),IOT(K),HOT(K),
+     &      Q0OT(K),Q1OT(K),Q2OT(K),Q3OT(K),              
+     &      PHIOT(K),THETAOT(K),PSIOT(K),        
+     &      FCOLLOT(K),FEDLOT(K),FVDWOT(K),
+     &      FDRGXOT(K),FDRGYOT(K),FDRGZOT(K),
+     &      WDIFXOT(K),WDIFYOT(K),WDIFZOT(K),
+     &      WBARXOT(K),WBARYOT(K),WBARZOT(K),            
+     &      XDIFOT(K),YDIFOT(K),ZDIFOT(K),
+     &      THXOT(K),THYOT(K),THZOT(K),
+     &      FLIFTXOT(K),FLIFTYOT(K),FLIFTZOT(K),       
+     &      UXOT(K),UYOT(K),UZOT(K),
+     &      VXOT(K),VYOT(K),VZOT(K), 
+     &      PTIMEFOT(K),AFRACTOT(K)
+            END DO
+            DO K = OUTCOUNT-1-MOD(OUTCOUNT-2-OUTFLAG,NPRINT),OUTCOUNT
+            WRITE (13,107)XOT(K),YOT(K),ZOT(K),IOT(K),HOT(K),
+     &      Q0OT(K),Q1OT(K),Q2OT(K),Q3OT(K),              
+     &      PHIOT(K),THETAOT(K),PSIOT(K),        
+     &      FCOLLOT(K),FEDLOT(K),FVDWOT(K),
+     &      FDRGXOT(K),FDRGYOT(K),FDRGZOT(K),
+     &      WDIFXOT(K),WDIFYOT(K),WDIFZOT(K),
+     &      WBARXOT(K),WBARYOT(K),WBARZOT(K),            
+     &      XDIFOT(K),YDIFOT(K),ZDIFOT(K),
+     &      THXOT(K),THYOT(K),THZOT(K),
+     &      FLIFTXOT(K),FLIFTYOT(K),FLIFTZOT(K),       
+     &      UXOT(K),UYOT(K),UZOT(K),
+     &      VXOT(K),VYOT(K),VZOT(K), 
+     &      PTIMEFOT(K),AFRACTOT(K)
+            END DO            
+C                          
+C           WRITE TO FLUX FILE
+            K = OUTCOUNT ! OUTPUT LAST ARRAY VALUE
+            WRITE (23,207)ipart,HOT(1),XOT(1),YOT(1),ZOT(1),
+     &            Q0OT(1), Q1OT(1),Q2OT(1),Q3OT(1), 
+     &            RINJ,HOT(K),XOT(K),YOT(K),ZOT(K),
+     &            Q0OT(K), Q1OT(K),Q2OT(K),Q3OT(K),
+     &            PTIMEFOT(1),PTIMEFOT(K),  
+     &            ETIME,TBULK,TNEAR,TFRIC,TRAJNEAR,
+     &            DISPNEAR,SECCOUNT,ATTACHK,AFRACT 
+C           WRITE TO FLUX FILE
+            IF (CLUSTER.EQ.0) THEN
+                  WRITE (33,207)ipart,HOT(1),XOT(1),YOT(1),ZOT(1),
+     &            Q0OT(1), Q1OT(1),Q2OT(1),Q3OT(1), 
+     &            RINJ,HOT(K),XOT(K),YOT(K),ZOT(K),
+     &            Q0OT(K), Q1OT(K),Q2OT(K),Q3OT(K),
+     &            PTIMEFOT(1),PTIMEFOT(K),
+     &            ETIME,TBULK,TNEAR,TFRIC,TRAJNEAR,
+     &            DISPNEAR,SECCOUNT,ATTACHK,AFRACT
+            END IF
+        END IF
+C
+      END DO !LOOP TO NEXT PARTICLE
+C
+      END PROGRAM HAPHETLN
+      
+!************************************************** KE ****************************************   
+C     SUBROUTINE GRAVITY      
+      SUBROUTINE GRAVITY(GRAVFACT,AP,BETA1,G,RHOP,RHOW,PI,FG)
+      DOUBLE PRECISION GRAVFACT,AP,G,RHOP,RHOW,PI,FG,BETA1
+      FG = GRAVFACT*(4.d0/3.d0)*(PI)*(AP**3)*BETA1*(RHOP-RHOW)*G
+      END SUBROUTINE GRAVITY
+      
+C     SUBROUTINE FORCE EDL AND VDW
+      SUBROUTINE FORCEDLVO (KAPPA,H,PI,INTEGFEDL,INTEGFVDW,
+     & KB,ERE0,ECHG,ZETAC,ZETAP1,ZETAP2,AP,BETA1,A132,
+     & MATRIX_A,ENX,ENY,ENZ,X,Y,Z,TDLVO,DELTASEI,PCOV,AG,PATCH)
+      DOUBLE PRECISION KAPPA,KB,ERE0,ECHG,ZETAC,ZETAP1,ZETAP2
+      DOUBLE PRECISION AP,H,PI,FEDL,INTEGFEDL,INTEGFVDW
+      DOUBLE PRECISION ALPHA,BETA,BETA1,HPRIME,DELTA0
+	DOUBLE PRECISION R,A,B,A132,DELTASEI,PCOV
+      DOUBLE PRECISION ENX,ENY,ENZ,NKBAR,AG
+      DOUBLE PRECISION X,Y,Z,XBAR,YBAR,ZBAR
+      DOUBLE PRECISION, DIMENSION(3,3) :: MATRIX_A,TRANSPOSEA
+      DOUBLE PRECISION, DIMENSION(1000,1000) :: PATCH
+      DOUBLE PRECISION NBAR(3),KBAR(3),N(3),K(3)      !NBAR IS THE NORMAL VECTOR ON THE SURFACE IN PARTICLE FRAME, AND KBAR IS THE VECTOR POINTING TO THE 'WALL'
+      DOUBLE PRECISION RVECTOR(3),ZBARVECTOR(3)
+C     LEVER is the 'force lever' vector, AND STCOLL IS TORQUE DIRCTION IN CO-MOVING FRAME,TDLVO IS THE CACULATED DLVO TORQUE  
+      DOUBLE PRECISION LEVER(3),STCOLL(3),TDLVO(3)
+      INTEGER I,J
+      A = AP  !semiaxis
+      DELTA0 =PI*DELTASEI !THE INCREMENT OF SURFACE INTEGRATION
+      B = BETA1  !beta value, b/a
+      KBAR(1)=-ENX
+      KBAR(2)=-ENY
+      KBAR(3)=-ENZ
+      TRANSPOSEA= TRANSPOSE(MATRIX_A) 
+      ! Start integration
+      INTEGFEDL = 0.0
+      INTEGFVDW = 0.0
+      TDLVO = (/0.0,0.0,0.0/)
+      I=0
+      J=0
+      DO 2700 BETA=0.0,2.0*PI,2.0*DELTA0
+          J=J+1
+          I=0
+		DO 2710 ALPHA=DELTA0/2.0,PI,DELTA0
+              I=I+1
+C             NORMAL OF SURFACE ELEMENTS SHOULD BE CALCULATED WITHIN THE LOOP              
+               NBAR(1)=SIN(ALPHA)*COS(BETA)/A**2.0/
+     &                 SQRT(SIN(ALPHA)**2.0*COS(BETA)**2.0
+     &                 /A**4.0+SIN(ALPHA)**2.0*SIN(BETA)**2.0/
+     &                 A**4.0+COS(ALPHA)**2.0/(A*B)**4.0)
+               NBAR(2)=SIN(ALPHA)*SIN(BETA)/A**2.0/
+     &                 SQRT(SIN(ALPHA)**2.0*
+     &                 COS(BETA)**2.0/A**4.0+SIN(ALPHA)**2.0*
+     &                 SIN(BETA)**2.0/A**4.0+COS(ALPHA)**2.0/(A*B)**4.0)
+               NBAR(3)=COS(ALPHA)/(A*B)**2.0/SQRT(SIN(ALPHA)**2.0*
+     &                 COS(BETA)**2.0/A**4.0+SIN(ALPHA)**2.0*
+     &                 SIN(BETA)**2.0/A**4.0+COS(ALPHA)**2.0/(A*B)**4.0)
+               N= MATMUL(TRANSPOSEA,NBAR)
+               NKBAR= DOT_PRODUCT(N,KBAR) 
+              ! Calculate r 
+			R = ((SIN(ALPHA)**2.0)*(COS(BETA)**2.0)/(A*A)
+     &            +(SIN(ALPHA)**2.0)*(SIN(BETA)**2.0)/(A*A) 
+     &            +(COS(ALPHA)**2.0)/(A*A*B*B))**(-0.5)
+C             Calculate HPRIME, SEPERATION DISTANCE
+              XBAR=TRANSPOSEA(1,1)*R*SIN(ALPHA)*COS(BETA)+
+     &            TRANSPOSEA(1,2)*R*SIN(ALPHA)*SIN(BETA)+
+     &            TRANSPOSEA(1,3)*R*COS(ALPHA)
+              YBAR=TRANSPOSEA(2,1)*R*SIN(ALPHA)*COS(BETA)+
+     &            TRANSPOSEA(2,2)*R*SIN(ALPHA)*SIN(BETA)+
+     &            TRANSPOSEA(2,3)*R*COS(ALPHA)
+              ZBAR=TRANSPOSEA(3,1)*R*SIN(ALPHA)*COS(BETA)+
+     &            TRANSPOSEA(3,2)*R*SIN(ALPHA)*SIN(BETA)+
+     &            TRANSPOSEA(3,3)*R*COS(ALPHA)
+              HPRIME = ((XBAR+X)*(XBAR+X)+(YBAR+Y)*(YBAR+Y)+
+     &               (ZBAR+Z)*(ZBAR+Z))**(0.5)-AG
+C             DOUBLE ELECTRIC FORCE DENSITY PER UNIT AREA 
+              IF (KAPPA*HPRIME.LE.300.0)  THEN
+                  IF (PATCH(I,J).EQ.1.0)  THEN    
+                      FEDL= -ERE0*(KAPPA**2.0)/2.0*((ZETAC**2.0+
+     &                     ZETAP1**2.0)/(SINH(KAPPA*HPRIME))**2.0-
+     &                     2.0*ZETAC*ZETAP1*COSH(KAPPA*HPRIME)/
+     &                     SINH(KAPPA*HPRIME)/SINH(KAPPA*HPRIME))
+                  ELSE
+                      FEDL= -ERE0*(KAPPA**2.0)/2.0*((ZETAC**2.0+
+     &                     ZETAP2**2.0)/(SINH(KAPPA*HPRIME))**2.0
+     &                     -2.0*ZETAC*ZETAP2*COSH(KAPPA*HPRIME)/
+     &                     SINH(KAPPA*HPRIME)/SINH(KAPPA*HPRIME))
+                  END IF
+              ELSE
+                  FEDL = 0.0
+              END IF
+C             VDW FORCE DENSITY PER UNIT AREA               
+              FVDW = -A132/6.0/PI/HPRIME**3.0
+C             Integration OVER PARTICLE SURFACE              
+              INTEGFVDW=INTEGFVDW+2.0*DELTA0**2.0*(R*R)*SIN(ALPHA)*
+     &                  NKBAR*FVDW
+              INTEGFEDL=INTEGFEDL+2.0*DELTA0**2.0*(R*R)*SIN(ALPHA)*
+     &                  NKBAR*FEDL
+C             TORQUE CALCULATION
+              RVECTOR(1)=R*SIN(ALPHA)*COS(BETA)
+              RVECTOR(2)=R*SIN(ALPHA)*SIN(BETA)
+              RVECTOR(3)=R*COS(ALPHA)
+C
+              LEVER=RVECTOR
+              K = MATMUL(MATRIX_A,KBAR)
+              STCOLL(1) = LEVER(2) * K(3) - LEVER(3) * K(2)
+              STCOLL(2) = LEVER(3) * K(1) - LEVER(1) * K(3)
+              STCOLL(3) = LEVER(1) * K(2) - LEVER(2) * K(1)
+              TDLVO = TDLVO+2.0*(DELTA0**2.0)*(R*R)*SIN(ALPHA)*
+     &                NKBAR*(-FEDL-FVDW)*STCOLL                                  !FOR THE TORQUE CALCULATION,POSITIVE FORCE MEANS REPULSION AND SHOULD HAVE A NEGTIVE SIGN
+2710		CONTINUE              
+2700		CONTINUE
+!      IF (ABS(INTEGFCOLLEDL).LT.1.0E-30) THEN
+!        INTEGFCOLLEDL = 0.0
+!	ENDIF
+      END SUBROUTINE FORCEDLVO 
+C
+C     SUBROUTINE DRIVING DRAG FORCE
+      SUBROUTINE FORCEDRAG (FUN2,FUN3,FUN4,M3,FDRGX,FDRGY,FDRGZ,VX,VY,VZ
+     &,UX,UY,UZ,BETA1,Q0,Q1,Q2,Q3,AP,VISC,MATRIX_A,FRDRGX,FRDRGY,FRDRGZ
+     &,KBAR,KDBLBAR)
+      DOUBLE PRECISION VX,VY,VZ,UX,UY,UZ,BETA1,Q0,Q1,Q2,Q3,AP,VISC
+      DOUBLE PRECISION FUN2,FUN3,FUN4,M3,FDRGX,FDRGY,FDRGZ
+      DOUBLE PRECISION FRDRGX,FRDRGY,FRDRGZ
+      INTEGER I,J
+      DOUBLE PRECISION U(3),V(3),UBAR(3),VBAR(3),FDRAG(3),FRDRAG(3)
+      DOUBLE PRECISION, DIMENSION(3,3) :: KBAR, KDBLBAR,TRANSPOSEA              !  TRANSPOSEA= TRANSPOSE(MATRIX_A)
+      DOUBLE PRECISION, DIMENSION(3,3) :: MATRIX_A, MATMUL1                     !  MATMUL1= MATMUL(KBAR,MATRIX_A)
+C	CALCULATE DRAG FORCES (AXIAL AND RADIAL). 
+C      	    
+          V(1)=VX
+          V(2)=VY
+          V(3)=VZ
+          U(1)=UX
+          U(2)=UY
+          U(3)=UZ
+C
+          TRANSPOSEA= TRANSPOSE(MATRIX_A)
+          MATMUL1= MATMUL(KBAR,MATRIX_A)
+          KDBLBAR=MATMUL(TRANSPOSEA,MATMUL1)
+          FDRAG = M3*MATMUL(KDBLBAR,V)
+C         WE NEED TO CHECH THE CORRECTION FUNCTION
+	    FDRGX = FDRAG(1)
+	    FDRGY = FDRAG(2)
+          FDRGZ = FDRAG(3)
+      END SUBROUTINE FORCEDRAG
+C     SUBROUTINE HYDRODYNAMIC DRAG TORQUE
+      SUBROUTINE TORQUEDRAG (X,Y,Z,PI,AP,
+     &BETA1,VISC,VSUP,MATRIX_A,ALPHA0,BETA0,GAMMA0,Wzy,Wxz,Wyx,
+     &TMULT1X,TMULT2X,TMULT1Y,TMULT2Y,TMULTZ,K1,K2,K3,K4,AG)
+C      
+      DOUBLE PRECISION X,Y,Z,BETA1,Q0,Q1,Q2,Q3,AP,VISC,ZSIM,VSUP
+      DOUBLE PRECISION PI,K1,K2,K3,K4,AG,R1,R2,R3,R5,R7
+      DOUBLE PRECISION F0,F1,F2,F3,F4
+      DOUBLE PRECISION Dzy,Dxz,Wzy,Wxz,Wyx,ALPHA0,BETA0,GAMMA0
+      DOUBLE PRECISION Ax,Ay,TMULT1X,TMULT2X,TMULT1Y,TMULT2Y,TMULTZ
+      INTEGER i,j
+      DOUBLE PRECISION, DIMENSION(3,3) :: GBAR,GDBLBAR,MATMUL1               !  GBAR IN PARTICLE FRAME, GDBLBAR IN CO-MOVING FRAME
+      DOUBLE PRECISION, DIMENSION(3,3) :: MATRIX_A, TRANSPOSEA               !  MATMUL1= MATMUL(KBAR,MATRIX_A)
+C	CALCULATE DRAG TORQUE ZHANG ET AL.,2001
+      
+      R1 = X*X+Y*Y+Z*Z
+      R2 = R1*R1
+      R3 =R1*(R1**0.5)
+      R5 =R1*R3
+      R7 =R1*R5
+      F0=3.0/2.0*K1*AG**3.0/R5+K2/2.0*AG/R3-K4/AG/AG
+      F1=-15.0/2.0*K1*AG**3.0/R7-3.0/2.0*K2*AG/R5
+      F2=-5*K1*X*AG**3/R7-3*K2*X*AG/R5-2*K3*X/R2
+      F3=5.0/2.0*K1*AG**3/R7-3.0/2.0*K2*AG/R5-2*K3/R2
+      F4=-K1/2.0*AG**3/R5+K2/2.0*AG/R3+K3/R1+2*K4/AG/AG
+C      
+      TRANSPOSEA= TRANSPOSE(MATRIX_A)      
+      GDBLBAR(1,1)=Z*F0+X*X*Z*F1
+      GDBLBAR(1,2)=X*Z*Y*F1
+      GDBLBAR(1,3)=X*F0+X*Z*Z*F1
+      GDBLBAR(2,1)=Y*Z*X*F1
+      GDBLBAR(2,2)=Z*F0+Y*Z*Y*F1
+      GDBLBAR(2,3)=Y*F0+Y*Z*Z*F1
+      GDBLBAR(3,1)=Z*Z*X*F2+2*X*F4+(X*X+Y*Y)*X*F3
+      GDBLBAR(3,2)=Z*Z*Y*F2+2*Y*F4+(X*X+Y*Y)*Y*F3
+      GDBLBAR(3,3)=Z*Z*Z*F2+(X*X+Y*Y)*Z*F3+
+     &             2*Z*(K1*AG**3/R5+K2*AG/R3+K3/R1+K4/AG/AG)
+      GDBLBAR = VSUP*GDBLBAR
+      MATMUL1= MATMUL(MATRIX_A,GDBLBAR)
+      GBAR=MATMUL(MATMUL1,TRANSPOSEA)
+      Dzy=(GBAR(3,2)+GBAR(2,3))/2.0
+      Dxz=(GBAR(1,3)+GBAR(3,1))/2.0
+      Wzy=(GBAR(3,2)-GBAR(2,3))/2.0
+      Wxz=(GBAR(1,3)-GBAR(3,1))/2.0
+      Wyx=(GBAR(2,1)-GBAR(1,2))/2.0
+C     DRAG TORQUE CALCULATION ZHANG ET AL., 2001  
+      Ax = 16.0*PI*VISC*(AP**3.0)*BETA1/3.0/(BETA0+BETA1*BETA1*GAMMA0)
+      TMULT1X = Ax*(1.0-BETA1*BETA1)*Dzy
+      TMULT2X = Ax*(1.0+BETA1*BETA1)
+      Ay = 16.0*PI*VISC*(AP**3.0)*BETA1/3.0/(ALPHA0+BETA1*BETA1*GAMMA0)
+      TMULT1Y = Ay*(BETA1*BETA1-1.0)*Dxz
+      TMULT2Y = Ay*(1.0+BETA1*BETA1) 
+      TMULTZ = 32.0*PI*VISC*(AP**3.0)*BETA1/3.0/(ALPHA0+BETA0)
+      END SUBROUTINE TORQUEDRAG
+C
+C     SUBROUTINE BROWNIAN MOTIONS
+       SUBROUTINE BROWNIAN (dT,KB,T,KBAR,AP,BETA1,VISC,PI,
+     &  XDIF,YDIF,ZDIF,WDIFX,WDIFY,WDIFZ,DIFFSCALE,MATRIX_A)
+       DOUBLE PRECISION dT,DIFFSCALE,XDIF,YDIF,ZDIF,DTX,DTY,DTZ,KB,T
+       DOUBLE PRECISION DRX,DRY,DRZ,PI,WDIFX,WDIFY,WDIFZ,AP,BETA1,VISC
+       DOUBLE PRECISION rsign1,rnum1,rsign2,rnum2,rsign3,rnum3,bigni,ni
+       DOUBLE PRECISION DIFBAR(3),DIFF(3)                   !DIFBAR ARE DIFFUSION DISPLACEMENT IN PARTICLE FRAME WHICH IS NEEDED TO CONVERT INTO INERTIAL FRAME DIFF
+       DOUBLE PRECISION, DIMENSION(3,3) :: KBAR,TRANSPOSEA,MATRIX_A
+       INTEGER nrand
+C      TRANSLATIONAL DIFISIVITY       
+       DTX=KB*T/VISC/6.0/PI/AP/KBAR(1,1)
+       DTY=KB*T/VISC/6.0/PI/AP/KBAR(2,2)
+       DTZ=KB*T/VISC/6.0/PI/AP/KBAR(3,3)
+C      ROTATIONAL DIFISIVITY
+       TRANSPOSEA= TRANSPOSE(MATRIX_A)
+       IF (BETA1.EQ.1.0) THEN
+           DRX=KB*T/(8.0*PI*VISC*AP**3.0)
+           DRY=KB*T/(8.0*PI*VISC*AP**3.0)
+           DRZ=KB*T/(8.0*PI*VISC*AP**3.0)
+       ELSE   
+       DRX=KB*T/((16.d0/3.d0*PI*VISC*AP**3.0)*(BETA1**4.0-1.0)/
+     &     ((2*BETA1**2.0-1)/(BETA1**2.0-1.0)**0.5*
+     &      LOG(BETA1+(BETA1**2.0-1)**0.5)-BETA1))
+       DRY=DRX
+       DRZ=KB*T/((16.d0/3.d0*PI*VISC*AP**3.0)*(BETA1**2.0-1)/(BETA1-1.0/
+     &    (BETA1**2.0-1.0)**0.5*LOG(BETA1+(BETA1**2.0-1)**0.5)))
+       END IF
+C       
+       CALL generate_unif(rsign1,rnum1,rsign2,rnum2,rsign3,rnum3,
+     &      nrand)
+C    		    CONVERT UNIFORM DISTRIBUTION TO GAUSSIAN DISTRIBUTION WITH ZERO MEAN AND VARIANCE OF UNITY   
+		    bigni = rnum1
+		    CALL calc_ni(bigni,ni)
+		    randm1 = ni*rsign1
+c
+		    bigni = rnum2
+		    CALL calc_ni(bigni,ni)
+		    randm2 = ni*rsign2 
+c
+		    bigni = rnum3   
+		    CALL calc_ni(bigni,ni)
+		    randm3 = ni*rsign3
+C             RANDOM DISPLACEMENT OF TRANSLATION 
+              DIFBAR(1)=DIFFSCALE*(randm1)*(2.0*DTX*dT)**0.5
+              DIFBAR(2)=DIFFSCALE*(randm2)*(2.0*DTY*dT)**0.5
+              DIFBAR(3)=DIFFSCALE*(randm3)*(2.0*DTZ*dT)**0.5
+              DIFF=MATMUL(TRANSPOSEA,DIFBAR)
+              XDIF=DIFF(1)
+              YDIF=DIFF(2)
+              ZDIF=DIFF(3)
+C              
+       CALL generate_unif(rsign1,rnum1,rsign2,rnum2,rsign3,rnum3,
+     &      nrand)
+C    		    CONVERT UNIFORM DISTRIBUTION TO GAUSSIAN DISTRIBUTION WITH ZERO MEAN AND VARIANCE OF UNITY   
+		    bigni = rnum1
+		    CALL calc_ni(bigni,ni)
+		    randm1 = ni*rsign1
+c
+		    bigni = rnum2
+		    CALL calc_ni(bigni,ni)
+		    randm2 = ni*rsign2 
+c
+		    bigni = rnum3   
+		    CALL calc_ni(bigni,ni)
+		    randm3 = ni*rsign3
+C             RANDOM ROTATIONAL DISPLACEMENT 
+              WDIFX=DIFFSCALE*(randm1)*(2.0*DRX*dT)**0.5
+              WDIFY=DIFFSCALE*(randm2)*(2.0*DRY*dT)**0.5
+              WDIFZ=DIFFSCALE*(randm3)*(2.0*DRZ*dT)**0.5
+              END SUBROUTINE BROWNIAN
+C
+C	SUBROUTINE TO IMPLEMENT ROTATIONAL DIFFUSION
+	SUBROUTINE RDIFF (TD1,TD2,TD3,MATRIX_A)
+      DOUBLE PRECISION, DIMENSION(3,3) :: MATRIX_A,TD1,TD2,TD3
+      DOUBLE PRECISION rsign1,rnum1,rsign2,rnum2,rsign3,rnum3
+      INTEGER  nrand
+
+C         CALL RANDOM NUMBER FOR ORINTATION      
+          CALL generate_unif(rsign1,rnum1,rsign2,rnum2,rsign3,rnum3,
+     & nrand)
+C 
+	  IF (rnum1.LT.1.0/6.0) THEN
+C         ROTATE MATRIX_A
+          	MATRIX_A=MATMUL(TD1,MATRIX_A)
+          	MATRIX_A=MATMUL(TD2,MATRIX_A)
+          	MATRIX_A=MATMUL(TD3,MATRIX_A)
+	  ELSE IF (rnum1.LT.2.0/6.0) THEN
+		MATRIX_A=MATMUL(TD1,MATRIX_A)
+          	MATRIX_A=MATMUL(TD3,MATRIX_A)
+          	MATRIX_A=MATMUL(TD2,MATRIX_A)	
+	  ELSE IF (rnum1.LT.3.0/6.0) THEN
+		MATRIX_A=MATMUL(TD2,MATRIX_A)
+          	MATRIX_A=MATMUL(TD1,MATRIX_A)
+          	MATRIX_A=MATMUL(TD3,MATRIX_A)
+	  ELSE IF (rnum1.LT.4.0/6.0) THEN
+		MATRIX_A=MATMUL(TD2,MATRIX_A)
+          	MATRIX_A=MATMUL(TD3,MATRIX_A)
+          	MATRIX_A=MATMUL(TD1,MATRIX_A)
+	  ELSE IF (rnum1.LT.5.0/6.0) THEN
+		MATRIX_A=MATMUL(TD3,MATRIX_A)
+          	MATRIX_A=MATMUL(TD2,MATRIX_A)
+          	MATRIX_A=MATMUL(TD1,MATRIX_A)
+	  ELSE
+		MATRIX_A=MATMUL(TD3,MATRIX_A)
+          	MATRIX_A=MATMUL(TD1,MATRIX_A)
+          	MATRIX_A=MATMUL(TD2,MATRIX_A)
+          END IF    
+
+      END SUBROUTINE RDIFF              
+!************************************************** KE END****************************************        
+C     SUBROUTINE ENERGY EDL PER UNIT AREA
+      SUBROUTINE ENERGYEDL (KAPPA,KB,ERE0,T,ZI,ECHG,ZETAC,ZETAP1,
+     &AG,AP,H,PI,EEDL)
+      DOUBLE PRECISION KAPPA,KB,ERE0,T,ZI,ECHG,ZETAC,ZETAP1,
+     &AG,AP,H,PI,EEDL
+      DOUBLE PRECISION COEF1
+C	CALC EDL ENERGY(SPHERE-SPHERE GEOMETRY) 
+      COEF1 = 64.0*PI*ERE0*AP*AG/(AP+AG)*(KB*T/ZI/ECHG)**2.0*
+     &   TANH(ZI*ECHG*ZETAC/4/KB/T)*TANH(ZI*ECHG*ZETAP1/4/KB/T)
+C     Lin et al. 2012 NEGATIVE DERIVATIVE OF ENERGY EXPRESSION
+      EEDL = COEF1*EXP(-KAPPA*H)/(PI*AP**2.0)
+      IF (ABS(EEDL).LT.1.0E-30) THEN
+        EEDL = 0.0
+	ENDIF
+      END SUBROUTINE ENERGYEDL
+
+C
+C     SUBROUTINE VDW ENEGY PER UNIT AREA
+      SUBROUTINE ENERGYVDW (PI,A132,AP,AG,H,LAMBDA,EVDW)
+      DOUBLE PRECISION PI,A132,EVDW,AP,AG,H,LAMBDA,B
+      B = 5.32 !COEFFICEINT FROM Gregory retarded vdw energy 1981 from Elimelech Part. Dep book
+C	CALC VDW (SPHERE-SPHERE GEOMETRY) Gregory retarded vdw energy 1981 from Elimelech Part. Dep book
+	EVDW = -(A132*AP*AG/6/(AP+AG))*(1-(B*H/LAMBDA)*LOG(1+LAMBDA/B/H))
+C     CALCULATE ENERGY PER UNIT AREA
+      EVDW = EVDW/(PI*AP**2.0)
+      END SUBROUTINE ENERGYVDW
+C
+C     SUBROUTINE STERIC FORCE
+      SUBROUTINE FORCESTE (PI,WO,LO,AP,AG,H,FSTE)
+      DOUBLE PRECISION PI,WO,LO,AP,AG,H,FSTE
+      FSTE = WO*EXP(-H/LO)*2.0*PI*AP
+      END SUBROUTINE FORCESTE
+C
+C     SUBROUTINE BORN FORCE (DIFFERENTIATED FROM ENERGY GIVEN BY ELIMELECH ET AL. 1998)
+      SUBROUTINE FORCEBORN (A132,SIGMAC,AP,H,FBORN)
+      DOUBLE PRECISION A132,SIGMAC,AP,H,FBORN
+	FBORN = -(A132*SIGMAC**6/7560)*((-54*AP-6*H)/
+     *	          (2*AP+H)**8+(-42*AP+6*H)/H**8)
+      END SUBROUTINE FORCEBORN  
+C
+!C     SUBROUTINE DRIVING DRAG FORCE
+!      SUBROUTINE FORCEDRAG (FUN2,FUN3,FUN4,M3,VN,VT,FDRGN,FDRGT)
+!      DOUBLE PRECISION FUN2,FUN3,FUN4,M3,VN,VT,FDRGN,FDRGT
+!C	CALCULATE DRAG FORCES (AXIAL AND RADIAL). 
+!	FDRGN = FUN2*M3*VN
+!	FDRGT = FUN3/FUN4*M3*VT
+!      END SUBROUTINE FORCEDRAG
+
+C     SUBOROUTINE DIFFUSION FORCE
+      SUBROUTINE FORCEDIFF(DIFFSCALE,T,AP,VISC,PI,KB,dT,FDIFZ,FDIFX,
+     & FDIFY)
+      DOUBLE PRECISION DIFFSCALE,T,AP,VISC,PI,KB,dT,FDIFZ,FDIFX,FDIFY,
+     & rsign1,rnum1,rsign2,rnum2,rsign3,rnum3,bigni,ni
+      INTEGER nrand
+C   		    CALL SUBROUTINE generate_unif WHICH USES SEED TO GENERATE TWO RANDOM NUMBERS IN 
+C    		    THE RANGE 0 TO 1 (UNIFORM DISTRIBUTION) AND WHICH GENERATES NEW SEED
+            CALL generate_unif(rsign1,rnum1,rsign2,rnum2,rsign3,rnum3,
+     &      nrand)
+C           ONLY POSITIVE DOMAIN LOWER LIMIT = 0.5 UPPER LIMIT FOR  + 2*STDEV= 0.9771 , SPAN = 0.4771
+            rnum1 = rnum1 * 0.4771+ 0.5
+            rnum2 = rnum2 * 0.4771+ 0.5
+            rnum3 = rnum3 * 0.4771+ 0.5
+C    		    CONVERT UNIFORM DISTRIBUTION TO GAUSSIAN DISTRIBUTION WITH ZERO MEAN AND VARIANCE OF UNITY   
+		    bigni = rnum1
+		    CALL calc_ni(bigni,ni)
+		    randm1 = ni*rsign1
+c
+		    bigni = rnum2
+		    CALL calc_ni(bigni,ni)
+		    randm2 = ni*rsign2 
+c
+		    bigni = rnum3   
+		    CALL calc_ni(bigni,ni)
+		    randm3 = ni*rsign3
+c     KIM AND ZYDNEY (2004) INDICATE FORMULAS USED ABOVE APPLY TO z AND r AND ARE ADDITIVE 
+	FDIFZ = DIFFSCALE*(randm1)*((12.0*PI*AP*VISC*KB*T/dT)**0.5)
+C     DIFFUSION APPLIED IN 3DIMENSIONS
+	FDIFX = DIFFSCALE*(randm2)*((12.0*PI*AP*VISC*KB*T/dT)**0.5)
+	FDIFY = DIFFSCALE*(randm3)*((12.0*PI*AP*VISC*KB*T/dT)**0.5)    
+      END SUBROUTINE FORCEDIFF 
+      
+    
+!	SUBROUTINE FROM KIRK NELSON AND TIM GINN TO CONVERT UNIFORM DISTRIBUTION WITH RANGE 0 TO 1
+!	TO GAUSSIAN DISTRIBUTION WITH ZERO MEAN AND UNIT VARIANCE	
+!	Curve fitting of output from ni.f90 (or ni2.f90) which was
+!	adapted from Cunningham (1969), Appl. Stat., vol. 18, no. 3
+	subroutine calc_ni(bigni,ni)
+	implicit none
+	DOUBLE PRECISION off1,off2,off3,a,b,c
+	DOUBLE PRECISION, intent(in)::bigni
+	DOUBLE PRECISION, intent(out)::ni
+
+	off1 = 1
+	off2 = 1
+	off3 = 1
+	a = -1.0
+	b = -1.0
+	c = -1.0
+
+	IF (bigni<=.001d0) THEN
+		ni = -1.37855370200823D19*bigni**6 +
+     *		  4.979009889572070D16*bigni**5 -
+     *		  7.214759669310110D13*bigni**4 +
+     *		  5.395500767177740D10*bigni**3 - 
+     *          2.260106114986480D7*bigni**2 +
+     *		  5.826517832043450D3*bigni - 4.129164575760240D0
+	ELSE IF (bigni>=.001d0 .and. bigni<.01d0) THEN
+	    ni = -6.18440506368D12*bigni**6 +
+     *		  2.367655494581510D11*bigni**5 - 
+     *          3.71327758909687D9*bigni**4 + 
+     *		  3.098709790040470D7*bigni**3 - 
+     *          1.51794899112573D5*bigni**2 +
+     *		  4.96459221152939D2*bigni - 3.45983671935511D0
+	ELSE IF (bigni>=.01d0 .and. bigni<.1d0) THEN
+		ni = -6.63992198925781D6*bigni**6 + 
+     *		  2.55090340507925D6*bigni**5 - 
+     *          4.03094347079323D5*bigni**4 +
+     *		  3.41189134002463D4*bigni**3 - 
+     *          1.71427218447456D3*bigni**2 + 
+     *		  5.95899557785023D1*bigni - 2.77770616554113D0
+	ELSE IF (bigni>=.1d0 .and. bigni<.5d0) THEN
+		ni = -2.07333319758618D1*bigni**4 +
+     *		  3.32434759389286D1*bigni**3 - 
+     *          2.07730620338030D1*bigni**2 + 
+     *		  8.58215179655931D0*bigni - 1.95934743109075D0
+	ELSE IF (bigni>=.5d0 .and. bigni<.9d0) THEN
+		ni =  2.0720122918894D1*bigni**4 - 
+     *		  4.96540631938802D1*bigni**3 +
+     *		  4.54066630995313D1*bigni**2 -
+     *		  1.61509902781561D1*bigni + 1.63751297685375D0
+	ELSE IF (bigni>=.9d0 .and. bigni<.99d0) THEN
+		ni = -1*(-6.63992198925781D6*(a*bigni+off1)**6 + 
+     *		  2.55090340507925D6*(a*bigni+off1)**5 - 
+     *          4.03094347079323D5*(a*bigni+off1)**4 +
+     *		  3.41189134002463D4*(a*bigni+off1)**3 - 
+     *          1.71427218447456D3*(a*bigni+off1)**2 + 
+     *		  5.95899557785023D1*(a*bigni+off1) - 2.77770616554113D0)
+	ELSE IF (bigni>=.99d0 .and. bigni<.9996d0) THEN
+	    ni = -1*(-6.18440506368D12*(b*bigni+off2)**6 +
+     *		  2.367655494581510D11*(b*bigni+off2)**5 - 
+     *          3.71327758909687D9*(b*bigni+off2)**4 + 
+     *		  3.098709790040470D7*(b*bigni+off2)**3 - 
+     *          1.51794899112573D5*(b*bigni+off2)**2 +
+     *		  4.96459221152939D2*(b*bigni+off2) - 3.45983671935511D0)
+	ELSE
+		ni = -1*(+1.37855370200823D19*(c*bigni+off3)**6 +
+     *		  4.979009889572070D16*(c*bigni+off3)**5 -
+     *		  7.214759669310110D13*(c*bigni+off3)**4 +
+     *		  5.395500767177740D10*(c*bigni+off3)**3 - 
+     *          2.260106114986480D7*(c*bigni+off3)**2 +
+     *		  5.826517832043450D3*(c*bigni+off3) - 4.129164575760240D0)
+	END IF
+	RETURN
+	end subroutine    
+    
+C       LIFT FORCE SUBROUTINE (NORMALIZED TO THE CLOSTEST SURFACE)
+        SUBROUTINE FORCELIFT (VISC,RHOW,H,AP,VTX,VTY,VTZ,R,FLIFT,VX,VY
+     &,VZ,UX,UY,UZ,PI,KDBLBAR)
+        DOUBLE PRECISION VISC,RHOW,H,AP,VTX,VTY,VTZ,R,FLIFTt,NIU,VT
+        DOUBLE PRECISION VX,VY,VZ,UX,UY,UZ,PI
+        DOUBLE PRECISION U(3),V(3),VU(3),FLIFT(3),MMULT1(3)
+        DOUBLE PRECISION, DIMENSION(3,3) :: L,KDBLBAR,MMULT
+C       (Saffman,1965 and 1968, with correct coefficient, without wall effect) Lift force will be very big for big sizes and fast velocities
+C      	    
+          V(1)=VX
+          V(2)=VY
+          V(3)=VZ
+          U(1)=UX
+          U(2)=UY
+          U(3)=UZ
+	  L= 0.0
+          L(1,1)=0.0501
+          L(1,2)=0.0329
+          L(2,1)=0.0182
+          L(2,2)=0.0173
+          L(3,3)=0.0373
+C         
+          VU= V-U
+          MMULT=MATMUL(KDBLBAR,L)
+          MMULT=MATMUL(MMULT,KDBLBAR)
+          MMULT1=MATMUL(MMULT,VU)
+        NIU = VISC/RHOW
+        IF ((H+AP) .LE. 50.0E-6) THEN
+            VT = (VTX**2.0+VTY**2.0+VTZ**2.0)**0.5
+!            FLIFTt = 81.2*VISC*(AP**3.0)*((VT/(H+AP))**1.5)/(NIU**0.5)
+            FLIFT = 36.0*PI*PI*VISC*AP*AP/(NIU**0.5)*((VT/(H+AP))**0.5)*
+     &              MMULT1
+        ELSE
+            FLIFT = 0.0
+!            FLIFTt =0.0
+        ENDIF
+        END SUBROUTINE FORCELIFT       
+
+C     SUBROUTINE TO OBTAIN INITIAL PARTICLE LOCATIONS
+      SUBROUTINE INITIAL (XINIT,YINIT,ZINIT,PHIINIT,THETAINIT
+     &           ,PSIINIT,PI,BETA1,AP,MATRIX_A
+     &           ,Q0,Q1,Q2,Q3,H,RLIM,RB,RINJ)   
+      DOUBLE PRECISION RLIM,RB,XINIT,YINIT,ZINIT,YSIM,ZSIM
+      DOUBLE PRECISION PHIINIT,THETAINIT,PSIINIT,PI,BETA1,AP
+      DOUBLE PRECISION rsign1,rnum1,rsign2,rnum2,rsign3,rnum3
+      DOUBLE PRECISION Q1,Q2,Q3,Q0,LAMBDA1,H1,H,RINJ
+      DOUBLE PRECISION, DIMENSION(3,3) :: MATRIX_A
+      INTEGER  nrand
+      RINJ = 2.0*RLIM
+      
+C         CALL RANDOM NUMBER FOR ORINTATION      
+          CALL generate_unif(rsign1,rnum1,rsign2,rnum2,rsign3,rnum3,
+     & nrand)
+          PHIINIT= rnum1*PI
+          THETAINIT= rnum2*PI
+          PSIINIT = rnum3*PI
+C         CALL RANDOM NUMBER FOR LOCATIONS      
+111       CALL generate_unif(rsign1,rnum1,rsign2,rnum2,rsign3,rnum3,
+     & nrand)
+          !XINIT = (rsign1 * rnum1)*RLIM
+          !YINIT = (rsign2 * rnum2)*RLIM 
+          !RINJ = (XINIT**2.0 + YINIT**2.0)**0.5
+C         INJECTION PLANE RB
+          XINIT = (rsign1 * rnum1)*RB
+          YINIT = (rsign2 * rnum2)*RB
+          IF (XINIT*XINIT+YINIT*YINIT.GE.RB*RB) THEN
+          GO TO 111
+          END IF    
+C     PROJECT INJECTION PLANE COORDINATES TO FLUID SHELL ENVELOPE
+          ZINIT = -(RB*RB-XINIT*XINIT-YINIT*YINIT)**0.5
+          END SUBROUTINE INITIAL
+C
+C     GENERATES THE CHARGE PATCHS ON PARTICLE SURFACE DEPENDING ON PARTICLE FRAME ANGLES OF SPHERICAL COORDINATES      
+      SUBROUTINE HETPATCH (DELTASEI,PATCH,PI,SCOV,PSIZE,A,BETA1)
+      DOUBLE PRECISION DELTASEI,DELTA0,ALPHA,BETA,PI,SCOV,A,B
+      DOUBLE PRECISION CURV,XBAR,YBAR,ZBAR,BETA1
+      DOUBLE PRECISION, DIMENSION(1000,1000) :: PATCH   
+      DOUBLE PRECISION rsign1,rnum1,rsign2,rnum2,rsign3,rnum3,bigni,ni
+      INTEGER I,K,nrand,M,N,PSIZE,PSIZEA,PSIZEB,K2
+      DOUBLE PRECISION R,R1,IMAX,KMAX,SA,SB
+C      
+      B=A*BETA1
+      DELTA0 =PI*DELTASEI
+      PATCH = 0.0
+      I=1
+      K=1
+      PSIZEA=1
+      PSIZEB=1
+      ALPHA=DELTA0/2.0
+      BETA=0.0
+!      OPEN(UNIT=666, FILE="OUT.txt")      
+      DO WHILE  (ALPHA.LT.PI)
+          BETA=0.0
+          DO WHILE (BETA.LT.2.0*PI)
+C     CALCULATE EQUIVALENT CURVATURE
+C             Calculate PARTICLE COORDINATES IN PARTICE FRAME
+              XBAR=A*SIN(ALPHA)
+              ZBAR=B*COS(ALPHA)
+              R1=XBAR
+              CURV=(A**4.0*ZBAR*ZBAR+B**4.0*XBAR*XBAR)**1.5
+     &             /(A**4.0*B**4.0)
+              SA=A/CURV
+              IF (SA.GT.100) THEN
+                  SA=100
+              ELSE IF (SA.LT.1.5) THEN
+                  SA=0    
+              END IF                      
+              PSIZEA=INT(SA)+1
+              IF (PSIZEA.GT.10) THEN
+                  PSIZEA=10 
+              ELSE IF (PSIZEA.LT.1) THEN
+                  PSIZEA=1    
+              END IF
+              IF (BETA1.EQ.1.0) THEN                !PSIZEA is eq to 1 for sphere, the previous calculation =2
+                  PSIZEA=1
+              END IF
+              IF (R1.EQ.0.0) THEN
+                  R1=1.0E-10
+              END IF    
+              SB=A/R1
+              IF (SB.GT.100) THEN
+                  SB=100
+              ELSE IF (SB.LT.1.5) THEN
+                  SB=0    
+              END IF 
+              PSIZEB=INT(SB)+1
+              IF (PSIZEB.GT.10) THEN
+                  PSIZEB=10
+              ELSE IF (PSIZEB.LT.1) THEN
+                  PSIZEB=1    
+              END IF
+C                  
+              CALL generate_unif(rsign1,rnum1,rsign2,rnum2,rsign3,rnum3,
+     &             nrand)
+              IF (rnum1.GE.SCOV)THEN
+                  rsign1= -1.0
+              ELSE
+                  rsign1= 1.0
+              END IF
+              IF (rnum2.GE.SCOV)THEN
+                  rsign2= -1.0
+              ELSE
+                  rsign2= 1.0
+              END IF                  
+              IMAX=I+PSIZEB*PSIZE
+              IF (IMAX.GE.1/DELTASEI) THEN
+                  IMAX=1/DELTASEI
+              END IF
+              KMAX=K+PSIZEA*PSIZE
+              IF (KMAX.GE.1/DELTASEI) THEN
+                  KMAX=1/DELTASEI
+              END IF
+              DO M=I,IMAX
+                 DO N=K,KMAX
+                    PATCH(M,N)= rsign1
+                 END DO 
+              END DO
+!          WRITE(666,"(2E14.6, 2I5)") ALPHA,BETA,PSIZEA,PSIZEB           
+          I=I+PSIZEB*PSIZE
+          BETA=BETA+2.0*DELTA0*PSIZEB*PSIZE
+          ENDDO
+          K=K+PSIZEA*PSIZE
+          I=1
+          ALPHA=ALPHA+DELTA0*PSIZEA*PSIZE
+      ENDDO
+C     FOR THE REST OF ELEMENTS NOT COVERED BY THE ABOVE INTEGRATION
+      IF (K.LT.1/DELTASEI)  THEN 
+          K2=K
+          DO K=K2,1/DELTASEI
+            DO I=1,1/DELTASEI
+               PATCH(I,K)= rsign2
+            END DO
+          END DO
+      END IF    
+      PATCH= TRANSPOSE(PATCH)
+      END SUBROUTINE HETPATCH
+      
+
+C     SUBROUTINE HAPPEL REVISED REAL COORDINATES INPUT (revised Feb 2015) 
+C     FLOW FIELD IS ALWAYS FROM MINUS Z TO PLUS Z
+      SUBROUTINE HAPPELFF (a,b,c,K1,K2,K3,K4,VxH1,VyH1,VzH1,AG)
+	IMPLICIT NONE
+	DOUBLE PRECISION, INTENT(IN):: a,b,c,K1,K2,K3,K4
+	DOUBLE PRECISION, INTENT(OUT):: VxH1,VyH1,VzH1
+	DOUBLE PRECISION RDIS,AG,FN,FT,RO,ROXY,VN,VT
+      RO = (a**2+b**2+c**2)**0.5 !REAL UNITS
+      RDIS = RO/AG                    !DIMENSIONLESS
+      ROXY = (a**2+b**2)**0.5         !REAL UNITS   
+      FN = K1/RDIS**3.0+K2/RDIS+K3+K4*RDIS**2.0 
+      FT = (-K1/(2.0*RDIS**3.0) +K2/(2.0*RDIS)+K3+2.0*K4*RDIS**2.0) 
+C     Obtain velocity components via differentiating streamline functions (REVISED DERIVATION)
+c     velocity components are dimensionless	
+      VxH1 = (a*c/RO**2)*(FN-FT)
+	VyH1 = (b*c/RO**2)*(FN-FT)
+	VzH1 = ((c/RO)**2)*(FN)+ ((ROXY/RO)**2.0)*(FT)
+C     NORMAL AND TANGENTIAL VELOCITIES
+C     VN = Z/RO*FN
+C     VT = ROXY/RO*FT     
+	END SUBROUTINE HAPPELFF
+
+!***************************************************************
+!            Pacific Northwest National Laboratory
+!***************************************************************
+!
+! NAME:  Module file "random"
+!
+! VERSION and DATE: 1.0 8-06-98
+!
+! PURPOSE:  Random number generation
+!
+! RETURNS:
+!
+! REQUIRED:
+!
+! LOCAL VARIABLES:
+!
+! COMMENTS: 
+!
+! MOD HISTORY: 
+!
+!
+!***************************************************************
+!***************************************************************
+
+      SUBROUTINE generate_unif(rsign1,rnum1,rsign2,rnum2,rsign3,rnum3,
+     &nrand)
+!	Generates three random numbers from UNIF[0,1]     
+	INTEGER i,nrand
+	DOUBLE PRECISION :: rnum1, rnum2, rnum3, rnumvec(6)
+      DOUBLE PRECISION :: rsign1,rsign2,rsign3
+      nrand = 6
+!	Set the type of random number generator
+!	intrinsinc Fortran r.n. generator for now
+!	Call the uniform(0,1) random number generator
+        DO i = 1, nrand
+          CALL RANDOM_NUMBER(rnumvec(i))
+        ENDDO
+!	Fill the random number structure
+      rsign1 = rnumvec(1) 
+      rnum1 = rnumvec(2)
+      rsign2  = rnumvec(3)
+      rnum2 = rnumvec(4)
+      rsign3 = rnumvec(5) 
+      rnum3 = rnumvec(6)
+!     Assing sing values to rsing variables depending center point of range of distribution 0 to 1
+      IF (rsign1.GE.0.5) THEN
+        rsign1 = 1.0
+      ELSE
+        rsign1 = -1.0
+      ENDIF
+      IF (rsign2.GE.0.5) THEN
+        rsign2 = 1.0
+      ELSE
+        rsign2 = -1.0
+      ENDIF
+      IF (rsign3.GE.0.5) THEN
+        rsign3 = 1.0
+      ELSE
+        rsign3 = -1.0
+      ENDIF
+	END SUBROUTINE generate_unif
+C
+C     SUBROUTINE AREAFRACT WRITTEN BY EDDY PAZMINO
+	SUBROUTINE AREAFRACT(XP,YP,ZP,RZOI,XHET1,YHET1,ZHET1,RHET1,AF)
+	DOUBLE PRECISION XP,YP,ZP,RZOI,XHET1,YHET1,ZHET1,RHET1,AF,AL
+      DOUBLE PRECISION DIST,PI,DHET,DZOI,AHETF
+      DATA PI/3.14159265359/ 
+      !RESET FRACTIONAL AREA CONTRIBUTION
+      AF = 0.0
+      !CALCULATE DISTANCE BETWEEN CENTER OF ZOI AND CENTER OF HETERODOMAIN
+      ! ASSUMES THAT CURVATURE OF COLLECTOR IS NEGLIGIBLE, THEREFORE OVERLAPPING AREA IS CALCULATED IN A PLANAR GEOMETRY
+      DIST = ((XP-XHET1)**2.0+(YP-YHET1)**2.0+(ZP-ZHET1)**2.0)**0.5
+      IF (DIST.GE.(RHET1+RZOI)) THEN !HETDOMAIN OUT OF ZOI, NO OVERLAPPING
+        AF = 0.0
+      ELSEIF (DIST.LT.(RHET1+RZOI)) THEN  !OVERLAPPING CONDITIONS
+        IF ((DIST.GT.ABS(RHET1-RZOI)).AND.(DIST.GE.1.0E-9)) THEN !PARTIAL OVERLAPPING
+            IF (RZOI.GT.RHET1) THEN
+                !!PARTIAL OVERLAPPING RZOI.GT.RHET0
+                DZOI = RZOI
+                DHET = RHET1
+            ELSE
+                !!PARTIAL OVERLAPPING RZOI.LE.RHET0
+                DZOI = RHET1
+                DHET = RZOI                      
+            END IF
+c           CALCULATE OVERLAPPING AREA 
+            AL=DHET*DHET*DACOS((DIST*DIST+DHET*DHET-DZOI*DZOI)/
+     &      (2*DIST*DHET))+DZOI*DZOI*DACOS((DIST*DIST+DZOI*DZOI-
+     &      DHET*DHET)/(2*DIST*DZOI))-0.5*((-1.0*DIST+DHET+DZOI)*
+     &      (DIST+DHET-DZOI)*(DIST-DHET+DZOI)*(DIST+DHET+DZOI))**0.5   
+C           CALCULATE FRACTIONAL OVERLAPPING AREA RELATIVE TO ZOI   
+            AF=AL/(PI*RZOI*RZOI) 
+        ELSE IF (DIST.LE.ABS(RHET1-RZOI)) THEN !COMPLETE OVERLAPPING
+            IF (RZOI.GT.RHET1) THEN
+                !COMPLETE OVERLAPPING RZOI.GT.RHET0
+                AF=RHET1*RHET1/(RZOI*RZOI)
+            ELSE
+                !COMPLETE OVERLAPPING RZOI.LE.RHET0
+                AF = 1.0
+            END IF
+        END IF
+      END IF     
+      END SUBROUTINE AREAFRACT
+      
+      
+      SUBROUTINE SOLVEH (A,B,AH1,AP,BETA1,H2,YH1,HCHK)
+      INTEGER HCHK  
+C
+      DOUBLE PRECISION BETA1
+      real*16 :: X(4),AH1(3),A1,A2,A3,A4,H2,YH1(3)
+      real*16 :: A,B,AP,H0(4),FE
+      real*16 :: B1,B2,B3,c1,c2,c3,third
+C
+      real*16 :: pi(2),qi(2)
+      real*16 :: f,g,h,p,q,r,s,Y1,Y2,Y3,Ya,Yb
+      real*16 :: f1,g1,h1,i1,j1,k1,l1,m1,n1,p1,r1,s1,t1,u1,ri,Xi,Yi
+C      
+      third=1.q0/3.q0
+C      
+      A1=-2.0*(AP*AP+AP*AP*BETA1*BETA1)
+      A2=(AP*AP+AP*AP*BETA1*BETA1)**2.0-A-B+2.0*(AP**4.0)*BETA1*BETA1
+      A3=-2.0*(AP*AP+AP*AP*BETA1*BETA1)*(AP**4.0)*BETA1*BETA1
+     &    +2.0*A*AP*AP*BETA1*BETA1+2.0*B*AP*AP
+      A4=(AP**8.0)*(BETA1**4.0)-A*(AP**4.0)*(BETA1**4.0)-B*(AP**4.0)
+C     
+      c1= -4.0*(A2**2.0-3.0*A1*A3+12.0*A4)**3.0
+     &    +(2.0*A2**3.0-9.0*A1*A2*A3+27.0*A3**2.0+
+     &     27.0*(A1**2.0)*A4-72.0*A2*A4)**2.0   !**0.5
+      IF (c1.LE.0.0) THEN 
+          c1=0.0
+      END IF
+      c2= 2.0*A2**3.0-9.0*A1*A2*A3+27.0*A3**2.0 
+     &     +27.0*A1**2.0*A4-72.0*A2*A4+c1**0.5 !**(1.0/3.0)
+      IF (c2.LT.0.0) THEN
+          c3= 2.0**(third)*(A2**2.0-3.0*A1*A3+ 12.0*A4)/(-3.0* 
+     &    (-c2)**(third))-(-c2)**(third)/(3.0*2.0**(third))
+      ELSE          
+          c3= 2.0**(third)*(A2**2.0-3.0*A1*A3+12.0*A4)/ 
+     &    (3.0*c2**(third))+c2**(third)/(3.0*2.0**(third))
+      END IF    
+      B1= A1**2.0/4.0-2.0*A2/3.0+c3
+      IF (B1.LE.0.0) THEN
+          B1=0.0
+          B2=0.0
+          B3=0.0
+      ELSE
+      B1=B1**0.5
+      B2=(A1**2.0)/2.0-4.0*A2/3.0-c3-
+     &     (-A1**3.0+4.0*A1*A2-8.0*A3)/4.0/B1
+      B3=(A1**2.0)/2.0-4.0*A2/3.0-c3+
+     &    (-A1**3.0+4.0*A1*A2-8.0*A3)/4.0/B1
+      END IF
+      IF (B2.LT.0.0) THEN
+          B2=0.0
+      END IF      
+      B2=B2**0.5     
+      IF (B3.LT.0.0) THEN
+          B3=0.0
+      END IF      
+      B3=B3**0.5
+C    SOLVE THE EQUATION of general form of the 4th degree equation (or Quartic) is:  ax4 + bx3 + cx2 + dx + e = 0
+
+      x(1) = -A1/4.0-1.0/2.0*B1-1.0/2.0*B2
+      x(2) = -A1/4.0-1.0/2.0*B1+1.0/2.0*B2
+      x(3) = -A1/4.0+1.0/2.0*B1-1.0/2.0*B3
+      x(4) = -A1/4.0+1.0/2.0*B1+1.0/2.0*B3
+      
+          
+!     x(1) = -b/(4*a) - 1/2*(b**2/(4*a**2) - 2*c/(3*a) + 2**(1/3) (c**2 - 3*b*d + 12*a*e)/(3*a*(2*c**3 - 9*b*c*d + 27*a*d**2 + 27*b**2*e - 72*a*c*e + (-4*(c**2 - 3*b*d + 12*a*e)**3 + (2*c**3 - 9*b*c*d + 27*a*d**2 + 27*b**2*e - 72*a*c*e)**2)**0.5)**(1/3)) + 1/(3*2**(1/3)*a)(2*c**3 - 9*b*c*d + 27*a*d**2 + 27*b**2*e - 72*a*c*e + (-4*(c**2 - 3*b*d*+ 12*a*e)**3 + (2*c**3 - 9*b*c*d + 27*a*d**2 + 27*b**2*e - 72*a*c*e)**2)**0.5)**(1/3))**0.5
+!      - 1/2*(b**2/(2*a**2) - 4*c/(3*a) - 2**(1/3)*(c**2 - 3*b*d + 12*a*e)/(3*a*(2*c**3 - 9*b*c*d + 27*a*d**2 + 27*b**2*e - 72*a*c*e + (-4*(c**2 - 3*b*d + 12*a*e)**3 + (2*c**3 - 9*b*c*d + 27*a*d**2 + 27*b**2*e - 72*a*c*e)**2)**0.5)**(1/3)) - 1/(3*2**(1/3)*a)(2*c**3 - 9*b*c*d + 27*a*d**2 + 27*b**2*e - 72*a*c*e + (-4*(c**2 - 3*b*d + 12*a*e)**3 + (2*c**3 - 9*b*c*d + 27*a*d**2 + 27*b**2*e - 72*a*c*e)**2)**0.5)**(1/3) - (-b**3/a**3 + 4*b*c/a**2 - 8*d/a)/(4*(b**2/(4*a**2) - 2*c/(3*a) + 2**(1/3)*(c**2 - 3*b*d + 12*a*e)/(3*a*((2*c**3 - 9*b*c*d + 27*a*d**2 + 27*b**2*e - 72*a*c*e + (-4*(c**2 - 3*b*d + 12*a*e)**3 + (2*c**3 - 9*b*c*d + 27*a*d**2 + 27*b**2*e - 72*a*c*e)**2)**0.5))**(1/3)) + 1/(3*2**(1/3)*a)(2*c**3 - 9*b*c*d + 27*a*d**2 + 27*b**2*e - 72*a*c*e + (-4*(c**2 - 3*b*d + 12*a*e)**3 + (2*c**3 - 9*b*c*d + 27*a*d**2 + 27*b**2*e - 72*a*c*e)**2)**0.5)**(1/3))**0.5))**0.5
+ 
+
+C          
+C    CALCULATE SEPERATION DISTANCE
+          H2=1.0E9
+          HCHK=0
+          DO I= 1,4
+              H0(i)=1.0E9
+C    Evaluate if the point is on the sphere
+                YH1(1)=-AH1(1)/(1.0-X(I)/AP/AP)
+                YH1(2)=-AH1(2)/(1.0-X(I)/AP/AP)
+                YH1(3)=-AH1(3)/(1.0-X(I)/AP/AP/BETA1/BETA1)
+                FE=ABS(YH1(1)*YH1(1)/AP/AP+YH1(2)*YH1(2)/AP/AP+ 
+     &             YH1(3)*YH1(3)/AP/AP/BETA1/BETA1-1.0)
+                IF (FE.LT.1.0E-8) THEN
+                H0(i)=(YH1(1)+AH1(1))*(YH1(1)+AH1(1))+(YH1(2)+AH1(2))*
+     &          (YH1(2)+AH1(2))+(YH1(3)+AH1(3))*(YH1(3)+AH1(3))
+                HCHK=1
+                END IF
+                IF (H2.GT.H0(i)) THEN
+                    H2=H0(I)
+                END IF
+          END DO
+          IF (HCHK.EQ.1) THEN
+              H2=H2**0.5
+          ELSE 
+C     COEFFICIENCY FOR CUBIC EQUATION
+          f=A2-(3.0*A1*A1/8.0)
+          g=A3+(A1**3.0/8.0)-(A1*A2/2.0)
+          h=A4-(3.0*A1**4.0/256)+(A1*A1*A2/16)-(A1*A3/4.0)
+          B1=f/2.0
+          B2=(f*f-4.0*h)/16.0
+          B3=-g*g/64.0
+C    SOLVE THE CUBIC EQUATION of general form of the 3rd degree equation is: x3 + B1x2 + B2x + B3 = 0
+          f1=B2-B1*B1/3.q0
+          g1=(2.0*B1**3.0-9.0*B1*B2+27.0*B3)/27.0
+          h1=g1*g1/4.0+f1**3.0/27.0
+          IF ((f1.LT.1E-3).AND.(g1.LT.1E-3).AND.(h1.LT.1E-3)) THEN
+              Y1=-(B3)**(third)
+              Y2=Y1
+              Y3=Y1
+              iCHK=1
+C         SOLUTION FOR QUARTIC
+              p=Y1**0.5
+              q=p
+              r=-g/(8.0*p*p)
+              s=A1/4.0
+              x(1) = p + q + r -s
+              x(2) = p - q - r -s
+              x(3) = -p + q - r -s
+              x(4) = -p - q + r -s           
+          ELSE IF (h1.LE.0.0) THEN
+              i1=((g1*g1/4.0)-h1)**0.5
+              j1=i1**(third)
+              k1=ACOS(-g1/2.0/i1)
+              l1=-j1
+              m1=COS(k1/3.q0)
+              n1=(3.0**0.5)*SIN(k1/3.q0)
+              p1=-B1/3.q0
+              Y1=2*j1*COS(k1/3.q0)-(B1/3.q0)
+              Y2=l1 * (m1 + n1) + p1
+              Y3=l1 * (m1 - n1) + p1
+              iCHK=2
+C         SOLUTION FOR QUARTIC
+              IF (Y1.GT.1E-6) THEN
+                  p=Y1**0.5
+                  IF (Y2.GT.1E-6) THEN
+                      q=Y2**0.5
+                      r=-g/(8.0*p*q)
+                      s=A1/4.0
+C              
+                      x(1) = p + q + r -s
+                      x(2) = p - q - r -s
+                      x(3) = -p + q - r -s
+                      x(4) = -p - q + r -s 
+                  ELSE IF (Y2.LT.1E-6) THEN
+                      q=(-Y2)**0.5         !imaginary number
+                      r=-g/(8.0*p*q)       !imaginary number 
+                      s=A1/4.0
+C                  
+                      x(1) = p + q + r -s
+                      x(2) = p - q - r -s
+                      x(3) = -p + q - r -s
+                      x(4) = -p - q + r -s
+                  ELSE      !Y2=0
+                      IF (Y3.GT.1E-6) THEN
+                          q=Y3**0.5
+                          r=-g/(8.0*p*q)
+                          s=A1/4.0
+C              
+                          x(1) = p + q + r -s
+                          x(2) = p - q - r -s
+                          x(3) = -p + q - r -s
+                          x(4) = -p - q + r -s
+                      ELSE
+                          q=(-Y3)**0.5         !imaginary number
+                          r=-g/(8.0*p*q)       !imaginary number 
+                          s=A1/4.0
+C                  
+                          x(1) = p + q + r -s
+                          x(2) = p - q - r -s
+                          x(3) = -p + q - r -s
+                          x(4) = -p - q + r -s
+                      END IF
+                   END IF             
+              ELSE IF (Y1.LT.-1E-6) THEN
+                  p=(-Y1)**0.5            !imaginary number
+                  IF (Y2.GT.1E-6) THEN
+                      q=Y2**0.5
+                      r=-g/(8.0*p*q)      !imaginary number
+                      s=A1/4.0
+C              
+                      x(1) = p + q + r -s
+                      x(2) = p - q - r -s
+                      x(3) = -p + q - r -s
+                      x(4) = -p - q + r -s 
+                  ELSE IF (Y2.LT.1E-6) THEN
+                      q=(-Y2)**0.5         !imaginary number
+                      r=g/(8.0*p*q)        ! i*i=-1
+                      s=A1/4.0
+C                  
+                      x(1) = p + q + r -s
+                      x(2) = p - q - r -s
+                      x(3) = -p + q - r -s
+                      x(4) = -p - q + r -s
+                  ELSE      !Y2=0
+                      IF (Y3.GT.1E-6) THEN
+                          q=Y3**0.5
+                          r=-g/(8.0*p*q)      !imaginary number
+                          s=A1/4.0
+C              
+                          x(1) = p + q + r -s
+                          x(2) = p - q - r -s
+                          x(3) = -p + q - r -s
+                          x(4) = -p - q + r -s
+                      ELSE
+                          q=(-Y3)**0.5         !imaginary number
+                          r=-g/(8.0*p*q)       !i*i=-1
+                          s=A1/4.0
+C                  
+                          x(1) = p + q + r -s
+                          x(2) = p - q - r -s
+                          x(3) = -p + q - r -s
+                          x(4) = -p - q + r -s
+                      END IF
+                   END IF                 
+              ELSE        ! Y1=0
+                  IF (Y2.GT.1E-6) THEN
+                      p=Y2**0.5
+                      IF (Y3.GT.1E-6) THEN
+                          q=Y3**0.5
+                          r=-g/(8.0*p*q)
+                          s=A1/4.0
+C              
+                          x(1) = p + q + r -s
+                          x(2) = p - q - r -s
+                          x(3) = -p + q - r -s
+                          x(4) = -p - q + r -s
+                      ELSE                 !Y3.LT 0
+                          q=(-Y3)**0.5        !imaginary number
+                          r=-g/(8.0*p*q)      !imaginary number
+                          s=A1/4.0
+                      END IF    
+C              
+                          x(1) = p + q + r -s
+                          x(2) = p - q - r -s
+                          x(3) = -p + q - r -s
+                          x(4) = -p - q + r -s
+                  ELSE                        !Y2.LT.0
+                      p=(-Y2)**0.5            !imaginary number
+                      IF (Y3.GT.1E-6) THEN
+                          q=Y3**0.5
+                          r=-g/(8.0*p*q)      !imaginary number
+                          s=A1/4.0
+C              
+                          x(1) = p + q + r -s
+                          x(2) = p - q - r -s
+                          x(3) = -p + q - r -s
+                          x(4) = -p - q + r -s
+                      ELSE                    !Y3.LT 0
+                          q=(-Y3)**0.5        !imaginary number
+                          r=g/(8.0*p*q)      !i*i=-1
+                          s=A1/4.0
+                          x(1) = p + q + r -s
+                          x(2) = p - q - r -s
+                          x(3) = -p + q - r -s
+                          x(4) = -p - q + r -s
+                      END IF                       
+                  END IF                      !IF (Y2.GT.1E-6) 
+                END IF
+          ELSE   !(h1.GT.0) 
+              r1=-(g1/2.0)+h1**0.5
+              IF (r1.LT.0.0) THEN
+                  s1=-(-r1)**(third)
+              ELSE    
+                  s1=r1**(third)
+              END IF   
+              t1=-(g1/2.0)-h1**0.5
+              IF (t1.LT.0.0) THEN
+                  u1=-(-t1)**(third)
+              ELSE    
+                  u1=t1**(third)
+              END IF   
+              Y1=(s1+u1)-B1/3.q0
+              Ya=-(s1+u1)/2.0-B1/3.q0
+              Yb=(s1-u1)*(3.0**0.5)/2.0
+              iCHK=3
+C         square roots of complex numbers 
+              Ri=(Ya*Ya+Yb*Yb)**0.5
+              Yi=((Ri-Ya)/2)**0.5
+              Xi=Yb/2.0/Yi
+              pi(1)=Xi             !pi() and qi() are square roots of complex numbers
+              pi(2)=Yi
+              qi(1)=Xi
+              qi(2)=-Yi
+              r=-g/(8.0*(Xi*Xi+Yi*Yi))
+              s=A1/4.0
+              x(1) = 2.0*Xi + r -s
+              x(2) = 2.0*Yi 
+              x(3) =- r -s
+              x(4) = -2.0*Xi + r -s 
+          END IF    
+C          
+C    CALCULATE SEPERATION DISTANCE
+          H2=1.0E9
+          HCHK=0
+          DO I= 1,4
+              H0(i)=1.0E9
+C    Evaluate if the point is on the sphere
+                YH1(1)=-AH1(1)/(1.0-X(I)/AP/AP)
+                YH1(2)=-AH1(2)/(1.0-X(I)/AP/AP)
+                YH1(3)=-AH1(3)/(1.0-X(I)/AP/AP/BETA1/BETA1)
+                FE=ABS(YH1(1)*YH1(1)/AP/AP + YH1(2)*YH1(2)/AP/AP + 
+     &             YH1(3)*YH1(3)/AP/AP/BETA1/BETA1-1.0)
+                IF (FE.LT.1.0E-8) THEN
+                H0(I)=(YH1(1)+AH1(1))*(YH1(1)+AH1(1))+(YH1(2)+AH1(2))*
+     &          (YH1(2)+AH1(2))+(YH1(3)+AH1(3))*(YH1(3)+AH1(3))
+                HCHK=1
+                END IF
+                IF (H2.GT.H0(i)) THEN
+                    H2=H0(i)
+                END IF   
+          END DO
+          H2=H2**0.5
+          END IF
+          END SUBROUTINE SOLVEH
+C
+C     SURBOUTINE SOLVING Gauss ELIMINATION SOLVING COUPLED LINEAR EQUATIONS  
+      SUBROUTINE GAUSS (dT,WBARX,WBARY,WBARZ,Q0O,Q1O,Q2O,Q3O,
+     &                 Q0,Q1,Q2,Q3)
+      DOUBLE PRECISION dT,WBARX,WBARY,WBARZ,Q0O,Q1O,Q2O,Q3O
+      DOUBLE PRECISION Q0,Q1,Q2,Q3,X,SUM
+      INTEGER N,I,J,K,FLAG
+      real*16, DIMENSION(4,4) :: A
+      real*16 :: B(4)
+C     PARAMETER MATRIX      
+      A(1,1)=1.0
+      A(1,2)=0.5*dT*WBARX
+      A(1,3)=0.5*dT*WBARY
+      A(1,4)=0.5*dT*WBARZ
+      A(2,1)=-0.5*dT*WBARX
+      A(2,2)=1.0
+      A(2,3)=-0.5*dT*WBARZ
+      A(2,4)=0.5*dT*WBARY
+      A(3,1)=-0.5*dT*WBARY
+      A(3,2)=0.5*dT*WBARZ
+      A(3,3)=1.0
+      A(3,4)=-0.5*dT*WBARX
+      A(4,1)=-0.5*dT*WBARZ
+      A(4,2)=-0.5*dT*WBARY
+      A(4,3)=0.5*dT*WBARX
+      A(4,4)=1.0
+C     RIGHT-HAND SIDE VECTOR 
+      B(1)=Q0O
+      B(2)=Q1O
+      B(3)=Q2O
+      B(4)=Q3O 
+C     INITIALIZATION
+      FLAG=1
+      SUM=0
+      N=4           !number of equations
+      
+C     CONVERT TO UPPER TRIANGULAR FORM 
+      DO K=1,N-1
+          IF(ABS(A(K,K)).GT.1.0E-10) THEN
+              DO I = K+1, N
+                  X = A(I,K)/A(K,K)
+                  DO J = K+1, N
+                      A(I,J) = A(I,J) -A(K,J)*X
+                  ENDDO
+              B(I) = B(I) - B(K)*X
+              ENDDO
+          ELSE
+          FLAG = 0                           !ZERO PIVOT FOUND IN LINE
+          END IF
+      ENDDO
+      DO I = N,1,-1
+          SUM = B(I)
+          IF (I.LT.N) THEN
+              DO J= I+1,N
+                  SUM = SUM - A(I,J)*B(J)
+              ENDDO
+          END IF
+         B(I) = SUM/A(I,I)
+         Q0=B(1)
+         Q1=B(2)
+         Q2=B(3)
+         Q3=B(4)
+      ENDDO      
+      END SUBROUTINE GAUSS
+C
+C     SURBOUTINE SOLVING Gauss ELIMINATION SOLVING COUPLED LINEAR EQUATIONS  
+      SUBROUTINE GAUSSU (A,B,FLAG)
+      real*16, DIMENSION(3,3) :: A
+      real*16 :: B(3),X,SUM
+      INTEGER N,I,J,K,FLAG
+      
+C         INITIALIZATION
+      FLAG=1
+      SUM=0
+      N=3           !number of equations
+      
+C     CONVERT TO UPPER TRIANGULAR FORM 
+      DO K=1,N-1
+          IF(ABS(A(K,K)).GT.1.0E-6) THEN
+              DO I = K+1, N
+                  X = A(I,K)/A(K,K)
+                  DO J = K+1, N
+                      A(I,J) = A(I,J) -A(K,J)*X
+                  ENDDO
+              B(I) = B(I) - B(K)*X
+              ENDDO
+          ELSE
+          FLAG = 0                           !ZERO PIVOT FOUND IN LINE
+          END IF
+      ENDDO
+      DO I = N,1,-1
+          SUM = B(I)
+          IF (I.LT.N) THEN
+              DO J= I+1,N
+                  SUM = SUM - A(I,J)*B(J)
+              ENDDO
+          END IF
+         B(I) = SUM/A(I,I)
+      ENDDO
+      END SUBROUTINE GAUSSU
+********************************************************************
+*************************************
+************************
+C     CLUSTER VERSION function and subroutines:
+
+      character*(*) function chri(i)
+c:  returns a character version of the integer i
+c:  chri must be declared as character*n in calling routine
+c:
+      implicit real*8(a-h,o-z)
+      character*5 fmt
+      character*40 hold
+      character*755 cdum
+      common/chrcm/fmt,hold,cdum
+      fmt='(i40)'
+      write(hold,fmt) i
+      call chrpak(hold,40,l)
+      chri=hold(1:l)
+      return
+      end
+
+      subroutine chrpak(c,lmax,lc)
+c: packs out blanks in a character string whose maximum length is lmax
+c: lc is returned as the packed length.
+c:
+      character*(*) c
+      character*800 ct
+      common/chrcm/ct
+      k=0
+      do 10 i=1,lmax
+          if(c(i:i).ne.' ') then
+            k=k+1
+            if(k.gt.800) stop 'abort - maxed out in chrpak'
+            ct(k:k)=c(i:i)
+          end if
+   10 continue
+      lc=k
+      c=ct(1:lc)
+      return
+      end
+      
+      
+! SUBROUTINE TO INITIALIZE RANDOM SEED DIFFERENT PER EACH IPART AND SYSTEM TIME
+      subroutine init_random_seed()
+        use iso_fortran_env, only: int64
+        implicit none
+        integer, allocatable :: seed(:)
+        integer :: i, n, un, istat, dt(8), pid, getpid
+        integer(int64) :: t
+      
+        call random_seed(size = n)
+        allocate(seed(n))
+        ! First try if the OS provides a random number generator
+        open(newunit=un, file="/dev/urandom", access="stream", 
+     &    form="unformatted", action="read", status="old", iostat=istat)
+        if (istat == 0) then
+           read(un) seed
+           close(un)
+        else
+           ! Fallback to XOR:ing the current time and pid. The PID is
+           ! useful in case one launches multiple instances of the same
+           ! program in parallel.
+           call system_clock(t)
+           if (t == 0) then
+              call date_and_time(values=dt)
+              t = (dt(1) - 1970) * 365_int64 * 24 * 60 * 60 * 1000 
+     &             + dt(2) * 31_int64 * 24 * 60 * 60 * 1000 
+     &             + dt(3) * 24_int64 * 60 * 60 * 1000 
+     &             + dt(5) * 60 * 60 * 1000 
+     &             + dt(6) * 60 * 1000 + dt(7) * 1000 
+     &             + dt(8)
+           end if
+           pid = getpid()
+           t = ieor(t, int(pid, kind(t)))
+           do i = 1, n
+              seed(i) = lcg(t)
+           end do
+        end if
+        call random_seed(put=seed)
+      contains
+        ! This simple PRNG might not be good enough for real work, but is
+        ! sufficient for seeding a better PRNG.
+        function lcg(s)
+          integer :: lcg
+          integer(int64) :: s
+          if (s == 0) then
+             s = 104729
+          else
+             s = mod(s, 4294967296_int64)
+          end if
+          s = mod(s * 279470273_int64, 4294967291_int64)
+          lcg = int(mod(s, int(huge(0), int64)), kind(0))
+        end function lcg
+      end subroutine init_random_seed
+	
+C 	END CLUSTER FUNCIONS AND SUBROUTINES
+************************
+*************************************
+********************************************************************

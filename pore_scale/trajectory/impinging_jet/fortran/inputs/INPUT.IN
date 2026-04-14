@@ -1,0 +1,77 @@
+Input for 3DJETLN and HAPHETLN
+Particle trajectory model for impinging jet utilizing linear approximation for heterogeneity calculation
+
+********Simulation parameters (integer values)
+# of colloids		Perfect sink(0) or Contact(1) or Perturbation(-1) mode	Single(0) or Parallel(1) simulation
+NPART			ATTMODE							CLUSTER
+100			1							0
+
+********Flow and simulation geometry parameters (Continuum flow field applies for VJET<1.273 m/s)
+Fluid velocity		Injection radius	Happel porosity		Happel Collector Radius	Jet exit radius		Total simulation time
+VSUP(m/s)		RLIM(m)			POROSITY		AG(m)			REXIT(m)		TTIME(s)
+1.70E-3			5.0E-6			0.35			255.0E-6		219.50E-6		5000.0
+
+********Colloid and fluid properties
+Colloid radius		Colloid density		Fluid density		Fluid viscosity		Relative permittivity	Temperature
+AP(m)			RHOP(kg/m3)		RHOW(kg/m3)		VISC(kg/m/s)		ER(-)			T(K)
+2.2E-6			1050.0			998.0			9.98E-4			80.0			293.2
+
+********Water chemistry and surface charge parameters
+Ionic strength		Valence of electrolyte		Colloid zeta potential		Collector zeta potential
+IS(mol/m3)		ZI(-)				ZETAPST(V)			ZETACST(V)
+6.0			1.0				-65.0E-3			-70.0E-3
+
+********Heterogeneity parameters collector (SCOV to 0 for no heterodomains, HETMODE to 1 for uniform, 5 for bimodal 1:4 large:medium, 9 for bimodal 1:8 large:medium, 73 for 1:8:64 large:medium:small)
+Heterodomain zeta potential	# of het. per tile	Large het. radius	Medium het. radius	Small het. radius	Fractional surface coverage
+ZETAHET(V)			HETMODE			RHET0(m)		RHET1(m)		RHET2(m)		SCOV(-)
+70.0E-3				73			90.0E-9 		45.0E-9			25.0E-9			0.00135
+
+********Heterogeneity parameters colloid (SCOVP to 0 for no heterodomains, HETMODEP to 1 for uniform, 5 for bimodal 1:4 small:large, 9 for bimodal 1:8 large:small)
+Heterodomain zeta potential	# of het. per tile	Large het. radius	Small het. radius	Fractional surface coverage
+ZETAHETP(V)			HETMODEP		RHETP0(m)		RHETP1(m)		SCOVP(-)
+65.0E-3				1			47.7E-9 		0.0E-9			0.39
+
+********Van der Waals force parameters - Make sure to set VDWMODE (If VDWMODE = 2,3,4; A132(J) entry is inconsequential)
+Combined Hamaker constant		vdW decay length		Uncoated (1), Layered colloid - Layered collector (2), Colloid - Layered collector (3), Layered colloid - collector (4)
+A132(J)					LAMBDAVDW(m)			VDWMODE
+7.17E-21				100.0E-9			1
+
+********Van der Waals force parameters - Coated systems
+Colloid Hamaker constants	Colloid coating Hamaker constant	Collector Hamaker constant	Collector coating Hamaker constant	Fluid Hamaker constant
+A11(J)				AC1C1(J)				A22(J)				AC2C2(J)				A33(J)
+0.0	                	0.0					0.0				0.0					0.0
+				
+********Van der Waals force parameters - Coated systems
+Colloid coating thickness 	Collector coating thickness	
+T1(m)				T2(m)				
+0.0	 	                0.0				
+
+********Lewis acid-base and steric hydration force parameters
+AB energy at min. sep.		AB decay length		Ste. energy at min. sep.	Ste. decay length
+GAMMA0AB(J/m2)			LAMBDAAB(m)		GAMMA0STE(J/m2)			LAMBDASTE(m)
+-27.0E-3			6.0E-10			17.0E-3				4.1E-10
+
+********Roughness parameters (Set Height Roughness mode to 0 for no roughness, 1 for rough colloid, 2 for rough collector, and 3 for rough colloid & collector)
+Slip Length	Height	Roughness mode		Asperity Height (fine scale)	Max Asperity Height (coarse scale for lever arm, can assume = B/2)
+B(m)		RMODE (-)			ASP (m)				ASP2 (m)
+110.0E-9	1				17.0E-9			        0.0E-9
+
+********Deformation parameters (W132 is negative for attractive)
+Combined elastic modulus	Work of Adhesion	Contact Radius Factor (1.0 for detachment, <1.0 for attachment)
+KINT(N/m2)			W132(J/m2)		BETA(-)
+4.36E9				-29.0E-3		0.5
+
+********Diffusion and Gravity factors (DIFFSCALE calibrated to 1.35 or 0.0 for none, GRAVFACT is -1.0 for concurrent, 1.0 for countercurrent, 0.0 for none)
+Multiplier of diffusion force		Multiplier of gravity force
+DIFFSCALE(-)				GRAVFACT(-)
+1.35					-1.0
+
+********Simulation time step and Slow motion parameters (displacement factors compare distance traveled to diffusion)
+Bulk time multiplier	Near-surface time mult.		Contact time mult.	Near-surface displacement factor	Contact displacement factor
+MULTB(-)		MULTNS(-)			MULTC(-)		DFACTNS(-)				DFACTC(-)
+1000			25				0.1			1.0E-6					1.0E-7
+
+********Output and Detachment parameters (integers)
+Output interval		Maximum output array size
+NOUT			PRINTMAX
+1000			10000
