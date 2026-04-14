@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>traj_hap / traj_jet — Trajectory Loop Flowchart</title>
+<style>
+  body { margin: 0; padding: 16px; font-family: sans-serif; background: #fff; color: #1a1a1a; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e0ddd4; }
+    svg { background: transparent; }
+    .box { fill: #2c2c2a; stroke: #5f5e5a; }
+    .arr { stroke: #888780; }
+    .t, .ts, .th { fill: #e0ddd4; }
+  }
+  svg { display: block; max-width: 800px; margin: 0 auto; }
+
+  /* color ramps — light mode */
+  .c-purple rect, .c-purple circle { fill: #EEEDFE; stroke: #534AB7; }
+  .c-purple .th { fill: #3C3489; } .c-purple .ts { fill: #534AB7; }
+  .c-teal rect, .c-teal circle   { fill: #E1F5EE; stroke: #0F6E56; }
+  .c-teal .th { fill: #085041; }   .c-teal .ts { fill: #0F6E56; }
+  .c-amber rect, .c-amber circle  { fill: #FAEEDA; stroke: #854F0B; }
+  .c-amber .th { fill: #633806; }  .c-amber .ts { fill: #854F0B; }
+  .c-blue rect, .c-blue circle    { fill: #E6F1FB; stroke: #185FA5; }
+  .c-blue .th { fill: #0C447C; }   .c-blue .ts { fill: #185FA5; }
+  .c-coral rect, .c-coral circle  { fill: #FAECE7; stroke: #993C1D; }
+  .c-coral .th { fill: #712B13; }  .c-coral .ts { fill: #993C1D; }
+  .c-red rect, .c-red circle      { fill: #FCEBEB; stroke: #A32D2D; }
+  .c-red .th { fill: #791F1F; }    .c-red .ts { fill: #A32D2D; }
+  .c-gray rect, .c-gray circle    { fill: #F1EFE8; stroke: #5F5E5A; }
+  .c-gray .th { fill: #444441; }   .c-gray .ts { fill: #5F5E5A; }
+
+  .box { fill: #F1EFE8; stroke: #888780; }
+  .arr { fill: none; stroke: #888780; stroke-width: 1; }
+  .leader { fill: none; stroke: #b4b2a9; stroke-width: 0.5; stroke-dasharray: 4 3; }
+  .t  { font-family: sans-serif; font-size: 14px; font-weight: 400; fill: #2c2c2a; }
+  .ts { font-family: sans-serif; font-size: 12px; font-weight: 400; fill: #5f5e5a; }
+  .th { font-family: sans-serif; font-size: 14px; font-weight: 500; fill: #2c2c2a; }
+  .node { cursor: default; }
+
+  /* dark mode overrides */
+  @media (prefers-color-scheme: dark) {
+    .c-purple rect { fill: #3C3489; stroke: #AFA9EC; }
+    .c-purple .th { fill: #EEEDFE; } .c-purple .ts { fill: #CECBF6; }
+    .c-teal rect   { fill: #085041; stroke: #5DCAA5; }
+    .c-teal .th { fill: #E1F5EE; }   .c-teal .ts { fill: #9FE1CB; }
+    .c-amber rect  { fill: #633806; stroke: #EF9F27; }
+    .c-amber .th { fill: #FAEEDA; }  .c-amber .ts { fill: #FAC775; }
+    .c-blue rect   { fill: #0C447C; stroke: #85B7EB; }
+    .c-blue .th { fill: #E6F1FB; }   .c-blue .ts { fill: #B5D4F4; }
+    .c-coral rect  { fill: #712B13; stroke: #F0997B; }
+    .c-coral .th { fill: #FAECE7; }  .c-coral .ts { fill: #F5C4B3; }
+    .c-red rect    { fill: #791F1F; stroke: #F09595; }
+    .c-red .th { fill: #FCEBEB; }    .c-red .ts { fill: #F7C1C1; }
+    .c-gray rect   { fill: #444441; stroke: #B4B2A9; }
+    .c-gray .th { fill: #F1EFE8; }   .c-gray .ts { fill: #D3D1C7; }
+    .box { fill: #2c2c2a; stroke: #5f5e5a; }
+    .arr { stroke: #888780; }
+    .t  { fill: #e0ddd4; }
+    .ts { fill: #b4b2a9; }
+    .th { fill: #e0ddd4; }
+  }
+</style>
+</head>
+<body>
+<svg width="100%" viewBox="0 0 680 1740" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+</defs>
+
+<!-- GEOMETRY NOTE -->
+<g class="c-gray">
+<rect x="40" y="18" width="600" height="48" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="36" text-anchor="middle" dominant-baseline="central">Geometry differs; all logic below is identical</text>
+<text class="ts" x="340" y="54" text-anchor="middle" dominant-baseline="central">hap: H = R &#8722; AG &#8722; AP &#183; normal radial outward &#160;|&#160; jet: H = Z &#8722; AP &#183; normal vertical (Z axis)</text>
+</g>
+
+<!-- INITIALISE -->
+<g class="node c-purple">
+<rect x="220" y="90" width="240" height="44" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="112" text-anchor="middle" dominant-baseline="central">Initialise particle (J)</text>
+</g>
+<line x1="340" y1="134" x2="340" y2="158" class="arr" marker-end="url(#arrow)"/>
+
+<!-- COMPUTE HFRIC / HMIN -->
+<g class="node c-purple">
+<rect x="200" y="158" width="280" height="44" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="174" text-anchor="middle" dominant-baseline="central">Compute HFRIC &amp; HMIN</text>
+<text class="ts" x="340" y="191" text-anchor="middle" dominant-baseline="central">brentq root-find; set DELTAMAX</text>
+</g>
+<line x1="340" y1="202" x2="340" y2="226" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="340" y="223" text-anchor="middle" dominant-baseline="central">while ATTACHK == 0</text>
+
+<!-- FORCES -->
+<g class="node c-teal">
+<rect x="180" y="230" width="320" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="250" text-anchor="middle" dominant-baseline="central">Compute forces</text>
+<text class="ts" x="340" y="268" text-anchor="middle" dominant-baseline="central">VDW &#183; EDL &#183; Born &#183; AB &#183; Steric &#183; Drag &#183; Diff &#183; Gravity &#183; Lift</text>
+</g>
+<line x1="340" y1="286" x2="340" y2="318" class="arr" marker-end="url(#arrow)"/>
+
+<!-- HETDOMAIN -->
+<g class="node c-teal">
+<rect x="200" y="318" width="280" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="338" text-anchor="middle" dominant-baseline="central">Heterodomain EDL (HFLAG &gt; 1)</text>
+<text class="ts" x="340" y="356" text-anchor="middle" dominant-baseline="central">Compute AFRACT; blend FEDL if SCOV &gt; 0</text>
+</g>
+<line x1="340" y1="374" x2="340" y2="406" class="arr" marker-end="url(#arrow)"/>
+
+<!-- ZONE DECISION -->
+<g class="node c-amber">
+<rect x="214" y="406" width="252" height="44" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="428" text-anchor="middle" dominant-baseline="central">Which zone?  H vs HNS / HFRIC</text>
+</g>
+
+<text class="ts" x="118" y="482" text-anchor="middle">H &gt; HNS</text>
+<text class="ts" x="340" y="482" text-anchor="middle">HFRIC &lt; H &#8804; HNS</text>
+<text class="ts" x="562" y="482" text-anchor="middle">H &#8804; HFRIC</text>
+<path d="M240 450 L118 450 L118 496" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arrow)"/>
+<line x1="340" y1="450" x2="340" y2="496" class="arr" marker-end="url(#arrow)"/>
+<path d="M440 450 L562 450 L562 496" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arrow)"/>
+
+<!-- BULK -->
+<g class="node c-blue">
+<rect x="44" y="496" width="148" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="118" y="516" text-anchor="middle" dominant-baseline="central">Bulk  (HFLAG=1)</text>
+<text class="ts" x="118" y="534" text-anchor="middle" dominant-baseline="central">dT = MULTB &#215; dTMRT</text>
+</g>
+
+<!-- NEAR-SURFACE -->
+<g class="node c-blue">
+<rect x="224" y="496" width="232" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="516" text-anchor="middle" dominant-baseline="central">Near-surface  (HFLAG=2)</text>
+<text class="ts" x="340" y="534" text-anchor="middle" dominant-baseline="central">dT = MULTNS &#215; dTMRT; IREF1++</text>
+</g>
+
+<!-- CONTACT -->
+<g class="node c-blue">
+<rect x="476" y="496" width="160" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="556" y="516" text-anchor="middle" dominant-baseline="central">Contact  (HFLAG=3)</text>
+<text class="ts" x="556" y="534" text-anchor="middle" dominant-baseline="central">dT = MULTC &#215; dTMRT; IREF2++</text>
+</g>
+
+<line x1="118" y1="552" x2="118" y2="590" class="arr" marker-end="url(#arrow)"/>
+<line x1="340" y1="552" x2="340" y2="590" class="arr" marker-end="url(#arrow)"/>
+<line x1="556" y1="552" x2="556" y2="590" class="arr" marker-end="url(#arrow)"/>
+
+<!-- EXIT CHECK -->
+<g class="node c-amber">
+<rect x="44" y="590" width="148" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="118" y="610" text-anchor="middle" dominant-baseline="central">Exit domain?</text>
+<text class="ts" x="118" y="628" text-anchor="middle" dominant-baseline="central">hap: R &gt; RB  |  jet: R &gt; REXIT</text>
+</g>
+
+<!-- NS SLOW-MOTION -->
+<g class="node c-amber">
+<rect x="214" y="590" width="252" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="610" text-anchor="middle" dominant-baseline="central">NS slow-motion? (IREF1 = 1000)</text>
+<text class="ts" x="340" y="628" text-anchor="middle" dominant-baseline="central">3D &#916;pos &lt; DFACTNS &#215; diffusion scale</text>
+</g>
+
+<!-- ATTMODE SPLIT -->
+<g class="node c-amber">
+<rect x="476" y="590" width="160" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="556" y="610" text-anchor="middle" dominant-baseline="central">ATTMODE?</text>
+<text class="ts" x="556" y="628" text-anchor="middle" dominant-baseline="central">0 = perfect sink; 1 = torque-balance</text>
+</g>
+
+<line x1="118" y1="646" x2="118" y2="686" class="arr" marker-end="url(#arrow)"/>
+<line x1="340" y1="646" x2="340" y2="686" class="arr" marker-end="url(#arrow)"/>
+<line x1="556" y1="646" x2="556" y2="686" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="84" y="684">yes</text>
+<text class="ts" x="306" y="684">yes</text>
+
+<!-- ATTACHK=1 -->
+<g class="node c-coral">
+<rect x="44" y="686" width="148" height="44" rx="8" stroke-width="0.5"/>
+<text class="th" x="118" y="702" text-anchor="middle" dominant-baseline="central">ATTACHK = 1</text>
+<text class="ts" x="118" y="719" text-anchor="middle" dominant-baseline="central">Exit domain</text>
+</g>
+
+<!-- ATTACHK=5 -->
+<g class="node c-coral">
+<rect x="214" y="686" width="252" height="44" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="702" text-anchor="middle" dominant-baseline="central">ATTACHK = 5</text>
+<text class="ts" x="340" y="719" text-anchor="middle" dominant-baseline="central">Retained &#8212; near-surface slow-motion</text>
+</g>
+
+<text class="ts" x="516" y="684">0</text>
+<text class="ts" x="590" y="684">1</text>
+<path d="M536 646 L510 646 L510 686" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arrow)"/>
+<path d="M576 646 L604 646 L604 686" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arrow)"/>
+
+<!-- ATTMODE=0 ATTACHK=2 -->
+<g class="node c-coral">
+<rect x="468" y="686" width="80" height="44" rx="8" stroke-width="0.5"/>
+<text class="th" x="508" y="702" text-anchor="middle" dominant-baseline="central">ATTACHK=2</text>
+<text class="ts" x="508" y="719" text-anchor="middle" dominant-baseline="central">Perfect sink</text>
+</g>
+
+<!-- TORQUE BALANCE -->
+<g class="node c-teal">
+<rect x="560" y="686" width="88" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="604" y="704" text-anchor="middle" dominant-baseline="central">Torque balance</text>
+<text class="ts" x="604" y="722" text-anchor="middle" dominant-baseline="central">Update UT via</text>
+<text class="ts" x="604" y="736" text-anchor="middle" dominant-baseline="central">rolling eqn.</text>
+</g>
+<line x1="604" y1="742" x2="604" y2="772" class="arr" marker-end="url(#arrow)"/>
+
+<!-- UT < 0 -->
+<g class="node c-amber">
+<rect x="556" y="772" width="96" height="44" rx="8" stroke-width="0.5"/>
+<text class="th" x="604" y="788" text-anchor="middle" dominant-baseline="central">UT &lt; 0?</text>
+<text class="ts" x="604" y="806" text-anchor="middle" dominant-baseline="central">Clamp; set ARRESTFLAG</text>
+</g>
+<line x1="604" y1="816" x2="604" y2="848" class="arr" marker-end="url(#arrow)"/>
+
+<!-- EQUILIBRIUM -->
+<g class="node c-amber">
+<rect x="548" y="848" width="112" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="604" y="866" text-anchor="middle" dominant-baseline="central">FADH &#8776; FREP?</text>
+<text class="ts" x="604" y="884" text-anchor="middle" dominant-baseline="central">&#177;0.5%; ARRESTFLAG=1</text>
+<text class="ts" x="604" y="898" text-anchor="middle" dominant-baseline="central">reset if not yet at equil.</text>
+</g>
+<line x1="604" y1="904" x2="604" y2="934" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="612" y="930">yes</text>
+
+<!-- ATTACHK=2 arrest -->
+<g class="node c-coral">
+<rect x="560" y="934" width="88" height="44" rx="8" stroke-width="0.5"/>
+<text class="th" x="604" y="950" text-anchor="middle" dominant-baseline="central">ATTACHK = 2</text>
+<text class="ts" x="604" y="967" text-anchor="middle" dominant-baseline="central">Arrest</text>
+</g>
+
+<!-- path from arrest to slow-motion -->
+<path d="M604 978 L604 1006" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arrow)"/>
+<text class="ts" x="612" y="1002">no / continue</text>
+
+<!-- CONTACT SLOW-MOTION -->
+<g class="node c-amber">
+<rect x="548" y="1006" width="112" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="604" y="1026" text-anchor="middle" dominant-baseline="central">Contact slow-motion?</text>
+<text class="ts" x="604" y="1044" text-anchor="middle" dominant-baseline="central">IREF2=1000; tangential</text>
+<text class="ts" x="604" y="1058" text-anchor="middle" dominant-baseline="central">&#916;pos &lt; DFACTC &#215; diffusion</text>
+</g>
+<line x1="604" y1="1062" x2="604" y2="1092" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="612" y="1089">yes</text>
+
+<!-- ATTACHK=4 -->
+<g class="node c-coral">
+<rect x="560" y="1092" width="88" height="44" rx="8" stroke-width="0.5"/>
+<text class="th" x="604" y="1108" text-anchor="middle" dominant-baseline="central">ATTACHK = 4</text>
+<text class="ts" x="604" y="1125" text-anchor="middle" dominant-baseline="central">Contact slow-motion</text>
+</g>
+
+<!-- H < H0 crash -->
+<path d="M604 1136 L604 1162" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arrow)"/>
+<g class="node c-red">
+<rect x="556" y="1162" width="96" height="44" rx="8" stroke-width="0.5"/>
+<text class="th" x="604" y="1178" text-anchor="middle" dominant-baseline="central">H &lt; H0?</text>
+<text class="ts" x="604" y="1196" text-anchor="middle" dominant-baseline="central">ATTACHK = 6 crash</text>
+</g>
+
+<!-- TIMEOUT -->
+<line x1="340" y1="730" x2="340" y2="1080" class="arr" stroke="#888780" stroke-width="1" marker-end="url(#arrow)"/>
+<text class="ts" x="348" y="1076">no attachment yet</text>
+<path d="M340 1080 L340 1162" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arrow)"/>
+<g class="node c-amber">
+<rect x="200" y="1162" width="280" height="44" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="1178" text-anchor="middle" dominant-baseline="central">PTIMEF &gt; TTIME?</text>
+<text class="ts" x="340" y="1196" text-anchor="middle" dominant-baseline="central">Simulation clock expired</text>
+</g>
+<line x1="340" y1="1206" x2="340" y2="1236" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="348" y="1232">yes</text>
+
+<!-- ATTACHK=3 -->
+<g class="node c-coral">
+<rect x="236" y="1236" width="208" height="44" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="1252" text-anchor="middle" dominant-baseline="central">ATTACHK = 3</text>
+<text class="ts" x="340" y="1269" text-anchor="middle" dominant-baseline="central">Remaining &#8212; time expired</text>
+</g>
+
+<!-- INTEGRATE MOTION -->
+<g class="node c-teal">
+<rect x="180" y="1330" width="320" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="1350" text-anchor="middle" dominant-baseline="central">Integrate motion</text>
+<text class="ts" x="340" y="1368" text-anchor="middle" dominant-baseline="central">Update UN, UT, OMEGA, X, Y, Z, R, H</text>
+</g>
+
+<!-- feedback loop arrow back to top -->
+<path d="M180 1358 L60 1358 L60 258 L180 258" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arrow)"/>
+<text class="ts" x="44" y="810" text-anchor="middle">next step</text>
+
+<!-- no-timeout → integrate -->
+<path d="M340 1206 L480 1206 L480 1358 L500 1358" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arrow)"/>
+<text class="ts" x="484" y="1202">no</text>
+
+<!-- IREF2 miss → integrate -->
+<path d="M548 1034 L460 1034 L460 1358 L480 1358" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arrow)"/>
+<text class="ts" x="454" y="1030" text-anchor="end">no &#8594; continue</text>
+
+<!-- SPEED COMPARISON NOTE -->
+<g class="c-gray">
+<rect x="40" y="1416" width="600" height="192" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="1438" text-anchor="middle" dominant-baseline="central">Per-step speed: traj_jet.py vs traj_hap.py</text>
+<text class="ts" x="340" y="1458" text-anchor="middle" dominant-baseline="central">traj_jet.py is faster per timestep due to simpler geometry &#8212; not a code quality difference</text>
+<text class="ts" x="60" y="1480">Flow field</text>
+<text class="ts" x="148" y="1480">jet: polynomial, 14 coeffs pre-computed once</text>
+<text class="ts" x="148" y="1494">hap: analytic Stokes evaluated every step</text>
+<text class="ts" x="60" y="1514">Gravity</text>
+<text class="ts" x="148" y="1514">jet: scalar added to UZ</text>
+<text class="ts" x="148" y="1528">hap: gravvect() &#8212; full normal/tangential decomposition per step</text>
+<text class="ts" x="60" y="1548">Velocity</text>
+<text class="ts" x="148" y="1548">jet: 3 scalar updates (UX, UY, UZ)</text>
+<text class="ts" x="148" y="1562">hap: decompose &#8594; normal/tangential update &#8594; recompose</text>
+<text class="ts" x="60" y="1582">Heterodomains</text>
+<text class="ts" x="148" y="1582">jet: 2D polar on flat surface (no rotation)</text>
+<text class="ts" x="148" y="1596">hap: quaternion 3D rotation to sphere tangent plane &#8212; evaluated every NS step</text>
+</g>
+
+<!-- OUTCOME LEGEND -->
+<rect x="40" y="1624" width="600" height="104" rx="8" class="box" stroke-width="0.5"/>
+<text class="th" x="340" y="1646" text-anchor="middle" dominant-baseline="central">Outcomes</text>
+<g class="c-coral"><rect x="56" y="1658" width="12" height="12" rx="2"/></g>
+<text class="ts" x="74" y="1668">1 Exit</text>
+<g class="c-coral"><rect x="136" y="1658" width="12" height="12" rx="2"/></g>
+<text class="ts" x="154" y="1668">2 Attached &#8212; arrest/sink</text>
+<g class="c-coral"><rect x="340" y="1658" width="12" height="12" rx="2"/></g>
+<text class="ts" x="358" y="1668">3 Remaining &#8212; timeout</text>
+<g class="c-coral"><rect x="56" y="1680" width="12" height="12" rx="2"/></g>
+<text class="ts" x="74" y="1690">4 Attached &#8212; contact slow-motion</text>
+<g class="c-coral"><rect x="340" y="1680" width="12" height="12" rx="2"/></g>
+<text class="ts" x="358" y="1690">5 Retained &#8212; near-surface slow-motion</text>
+<g class="c-red"><rect x="56" y="1702" width="12" height="12" rx="2"/></g>
+<text class="ts" x="74" y="1712">6 Crashed &#8212; H &lt; H0</text>
+
+</svg>
+</body>
+</html>
