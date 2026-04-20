@@ -1,0 +1,76 @@
+# Changelog
+# Parti_Suite AFM Force Volume Simulator
+
+## [2.21] - 2024-6-14
+### Added
+-Domain figure: text indicating that 3D figure can be rotated to domain plan view
+
+## [2.2] - 2024-6-2
+### Fixed
+- Domain figure: center of probe locations markers color for visibility
+### Added
+- Domain figure: vertical bars indicating AFRACT calue on each domain probed location 
+
+## [2.1] - 2023-1-1
+### Fixed
+- Input parameters titles
+- Figure titles corresponding to roughness and charge heterogeneity cases
+
+## [2.0] - 2023-1-1
+### Added
+- concavity effects in explicit roughnes calculation for RMODE=2 (asperities only on domain)
+
+## [1.9] - 2022-11-1
+### Added
+- Explicit roughness calculation
+
+## [1.8] - 2022-8-17
+### Fixed
+- Primary minima distance discrimination criteria
+
+## [1.7] - 2022-8-5
+### Fixed
+- Remove penetration distance in separation distance calculation
+
+- Avoid heatmaps and histogram generation if no barrier or no energy minimum are detected
+## [1.6] - 2022-8-3
+### Fixed
+- Avoid heatmaps and histogram generation if no barrier or no energy minimum are detected
+
+## [1.5] - 2021-10-6
+### Added
+- Hetdomain option figures
+- Error caching shifted from large heterodomain radiu to scov and scovp
+
+## [1.4] - 2021-07-14
+### Fixed
+- Steric and Born forces output
+
+## [1.3] - 2021-06-25
+### Added
+- User-defined separation distance boundaries for 
+- force barrier and minimum historgrams
+- Improved force profiles visualization
+
+## [1.2] - 2021-06-12
+### Added
+- Universities logos
+### Fixed
+- Optimized force profiles simulation
+- Improved output writing speed
+
+## [1.1] - 2021-06-04
+### Added
+- Histogram output
+### Changed
+- Histogram binning
+### Fixed
+- Output array size limit
+
+## [1.0] - 2021-06-02
+### Added
+- First released version
+### Changed
+- First released version
+### Removed
+- First released version
