@@ -1,0 +1,142 @@
+# Changelog
+Parti Suite Happel Trajectory GUI
+## [0.4.7] - 2022-11-15
+### Added
+- Roughness calculation performed in consistency with Dejarguin aproximation (H<=asperity radius)
+
+## [0.4.6] - 2022-2-19
+### Added
+- Unit vectors for gravity direction
+- Function to project gravity in normal and tangential
+
+## [0.4.5] - 2022-2-13
+### Fixed
+- GRavitational components incorrect from Hemisphere-in-cell model
+
+## [0.4.4] - 2021-12-12
+### Fixed
+- Fractional surface coverage reporting with SCOV 0.0 in plot
+
+## [0.4.3] - 2021-10-6
+### Added
+- Hetdomain option figures
+- Error caching shifted from large heterodomain radiu to scov and scovp
+
+
+Parti Suite Happel Trajectory GUI
+## [0.4.2] - 2021-6-8
+### Fixed
+- Hmin for repulsive VDW EDL and AB
+
+Parti Suite Happel Trajectory GUI
+## [0.4.1] - 2021-6-7
+### Fixed
+- Born force sign
+
+Parti Suite Happel Trajectory GUI
+## [0.3.9] - 2021-4-13
+### Added
+- Gravity alignment options: Concurrent with flow -Z, Counter-current with flow +Z,orthogonal to flow +x and, orthogonal to flow -x
+
+## [0.3.8] - 2021-2-10
+### Added
+- Visualize colloid and collector geometry prior to transport
+- Draw geometry button
+### Changed
+- Collector, colloid and hetdomains colorcoded based on charge
+
+## [0.3.7] - 2020-12-16
+### Fixed
+- Output frequency corresponds to figure frequency even if figures unchecked
+- Hover text fixed for DFACTC and DFACTNS
+### Added
+- Hover text describing attachment outcomes (ATTACHK)
+
+## [0.3.6] - 2020-11-25
+### Fixed
+- Set directory buttons from file explorer for both loading and perturbation modes
+### Changed
+- Reference distante to diffusion displament threshold value (IFER2) changed from 100 to 30 to improve contact trajectory resolution for large colloids
+
+## [0.3.5] - 2020-11-21
+### Fixed
+- Missing input parameter file name
+- Misssing load parameters from flux file
+
+## [0.3.4] - 2020-10-30
+### Fixed
+- Contact figure rendering
+- Updated perfect sink vs. contact and roughness inputs
+
+## [0.3.3] - 2020-10-26
+### Changed
+- Near surface plot as function of colloid size for nanoparticles
+
+## [0.3.2] - 2020-10-23
+### added
+- Near surface and contact visualization 
+- I/O colloid heterogeneity
+- Toggle detailed near surface and contact figures
+
+## [0.3.1] - 2020-08-19
+### added
+- documentation in code for ASP2 treatment and separation distance on colloid collector interactions
+### removed
+- secondary asperity heigh field text added only on GUI
+
+## [0.3.0] - 2020-08-06
+-working version to implement multiple heterodomain generation in colloid and collector
+
+## [0.2.9] - 2020-07-15
+### Added
+- Output interval continuous function tied to colloid radius
+
+## [0.2.8] - 2020-07-01
+### Changed
+- Output interval changed to Output interval factor for trajectory files.
+
+## [0.2.7] - 2020-06-10
+### Changed
+- Trajectory simulation plots presented in a single panel. Color coded for colloid position on bulk, near and contact domains.
+
+## [0.2.6] - 2020-05-12
+### Fixed
+- Load proper attachment condition from perturbation mode flux files
+
+## [0.2.5] - 2019-12-15
+
+### Fixed
+- Highly diffusive colloids exit top of Happel
+- van der Waals mode is included in output headers
+- Initial trajectory position
+- Slow rolling output in attachment flux file
+### Added
+- Particle number identifier consistent in loading and perturbation simulations
+
+
+## [0.2.4] - 2019-11-19
+### Fixed
+- Error in counting number of colloids to run in perturbation mode
+
+## [0.2.3] - 2019-11-13
+### Changed
+- Corrected gravity force calculation
+- Contact radius from 0.52 to 1 for pertubations
+- Fixed output array control
+### Added
+- Happel radius
+- Single collector efficiencies calculations
+
+## [0.2.2]
+### Changed
+- Changed default values to match xDLVO
+- Changed title of colloid and fluid properties box on GUI
+- Commented out lines 1340-1345 of Traj_happel.m because in contrast to Fortran version, the Matlab code introduced RZOIcont, a parameter absent in the Fortran code.  A value for RZOIcont was never actually calculated in the Matlab code.  When  those lines were commented out in Traj_happel.m, the AFRACT values seemed to be correctly calculated
+
+## [0.2.1] - 2019-09-19
+### Added
+- First released version
+### Changed
+- First released version
+### Removed
+- First released version
