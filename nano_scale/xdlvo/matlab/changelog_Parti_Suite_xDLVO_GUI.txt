@@ -1,0 +1,144 @@
+# Changelog
+Parti Suite xDLVO GUI
+## [0.2.8] - 2023-12-05
+### Fixed
+- Output of heterogeneity profiles headers
+- Read input parameters consistent with heterogeneity cases
+## Added
+- Output rZOI in parameters
+- Color code use of calculate and save profiles buttons to prevent inconsistent profiles-parameters output
+
+## [0.2.7] - 2023-11-15
+### Fixed
+- Output of mean field vs heterogeneity profiles
+
+## [0.2.6] - 2023-7-20
+### Added
+- User specified hetodomain radii
+
+## [0.2.5] - 2022-11-19
+### Added
+- Roughness calculation performed in consistency with Derjaguin aproximation (H<=asperity radius)
+
+## [0.2.4] - 2021-6-8
+### Fixed
+- ho determination
+
+Parti Suite xDLVO GUI
+## [0.2.3] - 2021-6-7
+### Fixed
+- Born force and energy sign
+
+Parti Suite xDLVO GUI
+## [0.2.2] - 2020-12-16
+### Fixed
+- Load parameters default file name
+
+## [0.2.1] - 2020-11-13
+### Fixed
+- Disable corresponding fields for coating system scenarios
+
+### Modified
+## [0.2.0] - 2020-10-28
+### Modified
+-  Heterodomain profiles plot, multiples sizes corresponding to 0.25, 0.50, 0.75, and 1.0 fractional area of ZOI
+
+## [0.1.9] - 2020-10-14
+### Added
+- Documentation for formulas for sphere-sphere and sphere-plate interactions
+
+## [0.1.8] - 2020-10-2
+### Changed
+- Imposed a floor (unity) on the number of asperities within the ZOI
+
+## [0.1.7] - 2019-12-15
+### Changed
+- GUI version
+- Default roughness = 1E-8 m to match Traj-Hap
+### Added
+- Heterodomain-influenced plots toggling with mean field plots
+- Axes control for toggling mean field and heterodomain-influenced plots.
+- Output heterodomain force and energy profiles.
+- Read in output from previous runs to make it easier to toggle values
+
+## [0.1.6] - 2019-11-11
+### Changed
+- GUI version
+### 
+- Line 894
+ - Delete *Nco
+- Line 896
+ - Delete *Nco
+- Line 899
+ - Theta = 1-pi/4
+- Lines 914-921
+ - Distance between offset smooth surfaces
+- Lines 979-999
+ - vdW, EDL, AB updated
+- Lines 1058-1078
+ - vdW, EDL, AB updated
+- Updated functions
+ - E_vdW_SS_RMODE.m
+ - F_vdW_SS_RMODE.m
+ - E_EDL_SS_RMODE.m
+ - F_EDL_SS_RMODE.m
+ - E_AB_SS_RMODE.m
+ - F_AB_SS_RMODE.m
+ - E_vdW_SP_RMODE.m
+ - F_vdW_SP_RMODE.m
+ - E_EDL_SP_RMODE.m
+ - F_EDL_SP_RMODE.m
+ - E_AB_SP_RMODE.m
+ - F_AB_SP_RMODE.m
+ ### Added
+ - Saving file progress bar
+
+## [0.1.5] - 2019-11-2
+### Changed
+- GUI version
+### Added
+-  Heterodomain profiles plot, multiples sizes corresponding to 0.2, 0.4, 0.6, and 0.8
+   fractional area of ZOI
+-  Corresponding heterodomain radii values updated in GUI
+### Removed
+- Heterodomain radius user input
+
+## [0.1.4] - 2019-10-21
+### Changed
+- GUI version
+### Added
+- Select Output Directory button
+### Removed
+- Outpuit directory panel
+
+## [0.1.3] - 2019-10-06
+### Changed
+- Fixed font sizes to match resizable GUI window
+### Added
+- Reset view button 
+### Removed
+- None
+
+## [0.1.2] - 2019-09-17
+### Changed
+- All GUI objets are normalized
+- GUI Window is resizable
+### Added
+- None
+### Removed
+- None
+
+## [0.1.1] - 2019-09-12
+### Changed
+- None
+### Added
+- Interaction over heterodomain option - profile plots
+- Input fields for heterodomain radius and zeta potential
+### Removed
+- None
+
+## [0.1.0] - 2019-08-08
+- First released version
+
+
+
