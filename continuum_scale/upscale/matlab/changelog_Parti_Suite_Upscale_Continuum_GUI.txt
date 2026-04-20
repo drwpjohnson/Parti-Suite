@@ -1,0 +1,108 @@
+# Changelog
+
+Parti Suite Upscale Continuum GUI
+## [0.3.5] - 2022-5-16
+### Added
+- Custom number of data points in BTCs
+
+Parti Suite Upscale Continuum GUI
+## [0.3.4] - 2022-1-26
+### Added
+- Differentiate attachment in fast and slow populations in histogram and output files
+
+## [0.3.3] - 2022-1-19
+### Fixed
+- Error assigning asperity values under user-defined case.
+
+## [0.3.2] - 2021-12-4
+### Fixed
+- Update all custom variable to _custom suffix.
+- Output parameters correspondance to trajectory-defined vs. user-defined
+
+## [0.3.1] - 2021-11-19
+### Added
+- Enable trajectory-defined and user-defined calculations of efficiencies and rate constants.
+
+## [0.3.0] - 2020-12-16
+### Fixed
+- Histograms legends
+
+## [0.2.9] - 2020-12-7
+### Fixed
+- Algorithm changed to allow explicit simulation without attachment 
+
+## [0.2.8] - 2020-1-15
+### Fixed
+- Average near surface  velocity calculation from appropriate attachement and exit colloids near surface residence time distributions
+- Average near surface  velocity estimated as 0.05*average pore water velocity when no overlapping residence time distributions for favorable and unfavorable attached colloids occurs
+
+## [0.2.7] - 2019-12-15
+### Fixed
+- Near surface velocity calculation when total overlap occurs in favorable vs unfavorable residence time distributions
+### Added
+- Warning and note explaining attachk conditions utilized in residence times calculations
+- Residence time histograms calculated from flux data included in output
+
+
+## [0.2.6] - 2019-10-20
+### Added
+- Guiding text in User-defined rate constants panel
+### Changed
+- BTCs figures 5 to 10 superimposed in figure 5
+- Updated version value in GUI
+
+## [0.2.5] - 2019-09-19
+### Added
+- Resizable GUI window
+- Updated version value in GUI
+
+## [0.2.4] - 2019-05-16
+### Changed
+- Tolerance of attachment separation distance for colloid collector mismatch to account for steric interactions set to 20 nm
+- Updated version value in GUI
+
+## [0.2.3] - 2019-04-25
+### Changed
+- Substracted near surface exiting colloids under favorable condition from total near surface calculation to allow alpha1 to become unity under favroable conditions
+- Updated version value in GUI
+
+## [0.2.2] - 2019-04-07
+### Added
+- Flux data parameters imported from xls file headers
+- Collector asperity height and colloid RMS roughness paramters imported and added to eficiency calculation and output
+- Colloid, collector radii, and porosity added as inputs for no trajectory data option
+- Output Favorable conditions single collector efficiency
+- Output Geometric mean water velocity
+
+### Changed
+- GUI format modified for no trajectory data option
+- Updated version value in GUI
+
+### Removed
+- Manual input pore scale parameters, except average near surface velocity
+
+### Fixed
+- Output text format
+
+## [0.2.1] - 2019-03-30
+### Added
+- Breakthrough curve graphic and text output at multiple distances
+
+## [0.2.0] - 2019-03-15
+### Added
+- Progress bars
+- Output histogram data to text files
+- Near surface velocity selection
+- User defined filtration parameters
+
+### Changed
+- GUI button control and format optimized
+- User defined parameters loading section
+- Alpha check dynamically changes format to indicate not valid alpha values
+- Updated version value in GUI
+
+### Removed
+- Static alpha check text
+
+### Fixed
+- Output text format
